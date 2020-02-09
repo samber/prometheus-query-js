@@ -4,7 +4,7 @@
 <a href="https://www.jsdelivr.com/package/npm/prometheus-query"><img src="https://data.jsdelivr.com/v1/package/npm/prometheus-query/badge" alt="jsDelivr Downloads"></img></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 
-> A Javascript client for Prometheus **query** and admin API.
+> A Javascript client for Prometheus **query** API.
 
 ## ✨ Features
 
@@ -51,8 +51,8 @@ pq.instantQuery('up{instance="demo.robustperception.io:9100",job="node"}')
     .then((res) => {
         const series = res.data.result;
         series.forEach((serie) => {
-	         console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
-   	     	  console.log("Time:", new Date(serie.value[0] * 1000));
+            console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
+            console.log("Time:", new Date(serie.value[0] * 1000));
             console.log("Value:", serie.value[1]);
         });
     })
@@ -125,4 +125,4 @@ There are many ways to contribute: writing code, documentation, reporting issues
 
 Give a ⭐️ if this project helped you!
 
-[![support us](https://img.shields.io/badge/become-a patreon%20us-orange.svg?cacheSeconds=2592000)](https://www.patreon.com/samber)
+[![support us](https://img.shields.io/badge/become-a%20patreon%20us-orange.svg?cacheSeconds=2592000)](https://www.patreon.com/samber)

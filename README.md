@@ -15,10 +15,6 @@
 - **UMD compatible**, you can use it with any module loader
 - Supports **query** and admin [APIs](https://prometheus.io/docs/prometheus/latest/querying/api/)
 
-### Demo
-
-A cheap in-browser demo [here](https://samber.github.io/prometheus-query-js/examples/browser).
-
 ## 🚀 Install
 
 ### NodeJS

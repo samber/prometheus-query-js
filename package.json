@@ -32,6 +32,8 @@
         "admin",
         "series",
         "range",
-        "label"
+        "label",
+        "timeseries",
+        "tsdb"
     ]
 }

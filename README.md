@@ -125,4 +125,10 @@ There are many ways to contribute: writing code, documentation, reporting issues
 
 Give a ⭐️ if this project helped you!
 
-[![support us](https://img.shields.io/badge/become-a%20patreon%20us-orange.svg?cacheSeconds=2592000)](https://www.patreon.com/samber)
+[![support us](https://c5.patreon.com/external/logo/become_a_patron_button@2x.png =160x)](https://www.patreon.com/samber)
+
+## 📝 License
+
+Copyright © 2020 [Samuel Berthe](https://github.com/samber).
+
+This project is [MIT](https://github.com/samber/prometheus-query-js/blob/master/LICENSE) licensed.

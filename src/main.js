@@ -1,0 +1,292 @@
+import axios from "axios";
+// import axios from "axios/dist/axios";
+// const axios = require('axios');
+
+export default class PrometheusQuery {
+
+    /**
+     * `options` has the following fields:
+     *      - endpoint: base path of Prometheus instance
+     *      - headers: headers to be sent (k/v format)
+     *      - auth: {username: 'foo', password: 'bar'}: basic auth 
+     *      - proxy: {host: '127.0.0.1', port: 9000}: hostname and port of a proxy server
+     *      - withCredentials: indicates whether or not cross-site Access-Control requests
+     *      - timeout: number of milliseconds before the request times out
+     *      - warningHook: a hook for handling warning messages
+     * @param {*} options 
+     */
+    constructor(options) {
+        options = options || {};
+        if (!options.endpoint)
+            throw "Endpoint is required";
+
+        this.endpoint = options.endpoint.replace(/\/$/, "");
+        this.headers = options.headers || {};
+        this.auth = options.auth || {};
+        this.proxy = options.proxy || {};
+        this.withCredentials = options.withCredentials || false;
+        this.timeout = options.timeout || 10000;
+
+        this.warningHook = options.warningHook;
+    }
+
+    request(method, uri, params, body) {
+        const req = axios.request({
+            baseURL: this.endpoint + "/api/v1/",
+            url: uri,
+            method: method,
+            params: params,
+            data: body,
+            headers: this.headers,
+            auth: {
+                username: this.proxy.username,
+                password: this.proxy.password
+            },
+            proxy: (!!this.proxy.host && !!this.proxy.port) ? {
+                host: this.proxy.host,
+                port: this.proxy.port
+            } : null,
+            withCredentials: this.withCredentials,
+            timeout: this.timeout,
+        });
+        return req
+            .then((res) => this.handleResponse(res))
+            .catch((res) => this.handleResponse(res));
+    }
+
+    handleResponse(response) {
+        const err = response.isAxiosError;
+        if (err)
+            response = response['response'];
+
+        if (!response)
+            throw {
+                status: 'error',
+                errorType: 'unexpected_error',
+                error: 'unexpected http error',
+            };
+
+        if (!!this.warningHook && !!response['warnings'] && response['warnings'].length > 0)
+            this.warningHook(response['warnings']);
+
+        if (!response.data || !response.data.status)
+            throw {
+                status: 'error',
+                errorType: 'client_error',
+                error: 'unexpected client error',
+            };
+
+        if (err)
+            throw response;
+        return response['data'];
+    }
+
+    /***********************  EXPRESSION QUERIES  ***********************/
+
+    /**
+     * Evaluates an instant query at a single point in time
+     * @param {*} query Prometheus expression query string.
+     * @param {*} time Evaluation Date object. Optional.
+     */
+    instantQuery(query, time) {
+        const params = {
+            query: query,
+            time: (time || new Date()).getTime(),
+        };
+        return this.request("GET", "query", params, null);
+    }
+
+    /**
+     * Evaluates an expression query over a range of time
+     * @param {*} query Prometheus expression query string.
+     * @param {*} start Start Date object.
+     * @param {*} end End Date object.
+     * @param {*} step Query resolution step width in float number of seconds.
+     */
+    rangeQuery(query, start, end, step) {
+        const params = {
+            query: query,
+            start: start,
+            end: end,
+            step: step,
+        };
+        return this.request("GET", "query_range", params, null);
+    }
+
+    /***********************  METADATA API  ***********************/
+
+    /**
+     * Finding series by label matchers
+     * @param {*} matchs Repeated series selector argument that selects the series to return.
+     * @param {*} start Start Date object.
+     * @param {*} end End Date object.
+     */
+    series(matchs, start, end) {
+        const params = {
+            match: matchs,
+            start: start,
+            end: end,
+        };
+        return this.request("GET", "series", params, null);
+    }
+
+    /**
+     * Getting label names
+     */
+    labelNames() {
+        return this.request("GET", "labels", null, null);
+    }
+
+    /**
+     * Querying label values
+     * @param {*} labelName This argument is not explicit ?
+     */
+    labelValues(labelName) {
+        return this.request("GET", `label/${labelName}/values`, null, null);
+    }
+
+    /**
+     * Overview of the current state of the Prometheus target discovery:
+     * @param {*} state Filter by target state. Can be 'active', 'dropped' or 'any'. Optional.
+     */
+    targets(state) {
+        const params = {
+            query: state || 'any',
+        };
+        return this.request("GET", "targets", params, null);
+    }
+
+    /**
+     * Returns metadata about metrics currently scraped from targets.
+     * @param {*} matchTarget Label selectors that match targets by their label sets. Optional.
+     * @param {*} metric Metric name to retrieve metadata for. Optional.
+     * @param {*} limit Maximum number of targets to match. Optional.
+     */
+    targetsMetadata(matchTarget, metric, limit) {
+        const params = {
+            match_target: matchTarget,
+            metric: metric,
+            limit: limit,
+        };
+        return this.request("GET", "targets/metadata", params, null);
+    }
+
+    /**
+     * Metadata about metrics currently scrapped from targets
+     * @param {*} metric Metric name to retrieve metadata for. Optional.
+     * @param {*} limit Maximum number of targets to match. Optional.
+     */
+    metadata(metric, limit) {
+        const params = {
+            metric: metric,
+            limit: limit,
+        };
+        return this.request("GET", "metadata", params, null);
+    }
+
+    /***********************  SERIES API  ***********************/
+
+    /**
+     * Getting a list of alerting and recording rules
+     */
+    rules() {
+        return this.request("GET", "rules", null, null);
+    }
+
+    /**
+     * Returns a list of all active alerts.
+     */
+    alerts() {
+        return this.request("GET", "alerts", null, null);
+    }
+
+    /**
+     * Returns an overview of the current state of the Prometheus alertmanager discovery.
+     */
+    alertmanagers() {
+        return this.request("GET", "alertmanagers", null, null);
+    }
+
+    /***********************  STATUS API  ***********************/
+
+    /**
+     * Following status endpoints expose current Prometheus configuration.
+     */
+    status() {
+        return this.request("GET", "status/config", null, null);
+    }
+
+    /**
+     * Returns flag values that Prometheus was configured with.
+     * New in v2.2
+     */
+    statusFlags() {
+        return this.request("GET", "status/flags", null, null);
+    }
+
+    /**
+     * Returns runtime information properties that Prometheus was configured with.
+     * New in v2.14
+     */
+    statusRuntimeInfo() {
+        return this.request("GET", "status/runtimeinfo", null, null);
+    }
+
+    /**
+     * Returns various build information properties about Prometheus Server.
+     */
+    statusBuildinfo() {
+        return this.request("GET", "status/buildinfo", null, null);
+    }
+
+    /**
+     * Returns various cardinality statistics about the Prometheus TSDB.
+     * New in v2.14
+     */
+    statusTSDB() {
+        return this.request("GET", "status/tsdb", null, null);
+    }
+
+
+    /***********************  ADMIN API  ***********************/
+
+    /**
+     * Creates a snapshot of all current data
+     * New in v2.1
+     * @param {*} skipHead Skip data present in the head block. Boolean. Optional.
+     */
+    adminSnapshot(skipHead) {
+        const params = {
+            skip_head: skipHead,
+        };
+        return this.request("POST", "admin/tsdb/snapshot", params, null);
+    }
+
+    /**
+     * Deletes data for a selection of series in a time range
+     * New in v2.1
+     * @param {*} matchs Repeated series selector argument that selects the series to return.
+     * @param {*} start Start Date object.
+     * @param {*} end End Date object.
+     */
+    adminDeleteSeries(matchs, start, end) {
+        const params = {
+            match: matchs,
+            start: start,
+            end: end,
+        };
+        return this.request("POST", "admin/tsdb/delete_series", params, null);
+    }
+
+    /**
+     * Removes the deleted data from disk and cleans up
+     * New in v2.1
+     * @param {*} matchs Repeated series selector argument that selects the series to return.
+     * @param {*} start Start Date object.
+     * @param {*} end End Date object.
+     */
+    adminCleanTombstones() {
+        return this.request("POST", "admin/tsdb/clean_tombstones", null, null);
+    }
+
+};

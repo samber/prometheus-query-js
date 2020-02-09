@@ -1,0 +1,28 @@
+{
+    "name": "prometheus-query",
+    "version": "1.0.0",
+    "main": "dist/prometheus-query.cjs.js",
+    "module": "dist/prometheus-query.esm.js",
+    "browser": "dist/prometheus-query.umd.js",
+    "dependencies": {
+        "axios": "^0.19.2",
+        "rollup-plugin-node-builtins": "^2.1.2",
+        "rollup-plugin-node-globals": "^1.4.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^11.0.1",
+        "@rollup/plugin-json": "^4.0.2",
+        "@rollup/plugin-node-resolve": "^7.0.0",
+        "@rollup/plugin-replace": "^2.3.1",
+        "rollup": "^1.31.0"
+    },
+    "scripts": {
+        "build": "rollup -c",
+        "dev": "rollup -c -w",
+        "test": "node test/test.js",
+        "pretest": "npm run build"
+    },
+    "files": [
+        "dist"
+    ]
+}

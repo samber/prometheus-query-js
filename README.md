@@ -44,8 +44,12 @@ const pq = new PrometheusQuery({
 // last `up` value
 pq.instantQuery('up{instance="demo.robustperception.io:9100",job="node"}')
     .then((res) => {
-        console.log("Time:", new Date(res.data.result[0].value[0] * 1000));
-        console.log("Value:", res.data.result[0].value[1]);
+        const series = res.data.result;
+        series.forEach((serie) => {
+	         console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
+   	     	  console.log("Time:", new Date(serie.value[0] * 1000));
+            console.log("Value:", serie.value[1]);
+        });
     })
     .catch(console.error);
 ```
@@ -53,6 +57,7 @@ pq.instantQuery('up{instance="demo.robustperception.io:9100",job="node"}')
 Output:
 
 ```txt
+Serie: up{instance="demo.robustperception.io:9100", job="node"}
 Time: Sun Feb 09 2020 22:04:41 GMT+0100 (Central European Standard Time)
 Value: 1
 ```
@@ -65,18 +70,11 @@ pq.rangeQuery("up", new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 
     .then((res) => {
         const series = res.data.result;
         series.forEach((serie) => {
-            const name = serie.metric['__name__'];
-            const labels = serie.metric;
-
-            delete labels['__name__'];
-            strLabels = Object.keys(labels).map((curr) => curr + '="' + labels[curr] + '"');
-            const serieName = name + '{' + strLabels.join(', ') + '}';
-
-            console.log("Serie:", serieName);
+            console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
             console.log("Values:", JSON.stringify(serie.values));
         });
     })
-    .catch(console.error(err));
+    .catch(console.error);
 ```
 
 Output:

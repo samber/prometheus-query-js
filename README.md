@@ -1,6 +1,7 @@
 
 # Welcome to prometheus-query  👋
 [![NPM version](https://img.shields.io/npm/v/prometheus-query.svg?style=flat-square)](https://npmjs.org/package/prometheus-query)
+<a href="https://www.jsdelivr.com/package/npm/prometheus-query"><img src="https://data.jsdelivr.com/v1/package/npm/prometheus-query/badge" alt="jsDelivr Downloads"></img></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 
 > A Javascript client for Prometheus **query** and admin API.
@@ -25,7 +26,11 @@ npm install prometheus-query
 ### Browser
 
 ```html
+<script src="https://cdn.jsdelivr.net/npm/prometheus-query/dist/prometheus-query.umd.min.js"></script>
 
+<script type="application/javacript">
+	const pq = new PrometheusQuery(...);
+</script>
 ```
 
 ## 💡 Quick start

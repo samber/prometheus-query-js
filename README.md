@@ -125,7 +125,7 @@ There are many ways to contribute: writing code, documentation, reporting issues
 
 Give a ⭐️ if this project helped you!
 
-[![support us](https://c5.patreon.com/external/logo/become_a_patron_button@2x.png =160x)](https://www.patreon.com/samber)
+[![support us](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/samber)
 
 ## 📝 License
 

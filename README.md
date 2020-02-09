@@ -108,6 +108,16 @@ Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001
 npm run test
 ```
 
+## 🔐 Security advisory
+
+If you open a Prometheus instance on Internet, it would be a good idea to block some routes. 
+
+Start by blocking /api/v1/admin. I'm pretty sure allowing only /api/v1/query and /api/v1/query_range will match your needs.
+
+Also don't use Prometheus as a multitenant timeseries database!
+
+At your own risk... 😘
+
 ## 🤝 Contributing
 
 The Prometheus Query client is open source and contributions from community (you!) are welcomed.

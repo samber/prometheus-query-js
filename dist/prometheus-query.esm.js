@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-export default class PrometheusQuery {
+class PrometheusQuery {
 
     /**
      * Creates a PrometheusQuery client
@@ -296,4 +296,6 @@ export default class PrometheusQuery {
         return this.request("POST", "admin/tsdb/clean_tombstones", null, null);
     }
 
-};
+}
+
+export default PrometheusQuery;

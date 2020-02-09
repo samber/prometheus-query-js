@@ -1,8 +1,5 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-// import json from '@rollup/plugin-json';
-// import globals from 'rollup-plugin-node-globals';
-// import builtins from 'rollup-plugin-node-builtins';
 import pkg from './package.json';
 
 export default [
@@ -19,9 +16,6 @@ export default [
                 browser: true
             }), // so Rollup can find `axios`
             commonjs(), // so Rollup can convert `axios` to an ES module
-            // globals(),
-            // builtins(),
-            // json()
         ],
     },
 

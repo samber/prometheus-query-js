@@ -1,6 +1,10 @@
-import axios from "axios";
+'use strict';
 
-export default class PrometheusQuery {
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var axios = _interopDefault(require('axios'));
+
+class PrometheusQuery {
 
     /**
      * Creates a PrometheusQuery client
@@ -296,4 +300,6 @@ export default class PrometheusQuery {
         return this.request("POST", "admin/tsdb/clean_tombstones", null, null);
     }
 
-};
+}
+
+module.exports = PrometheusQuery;

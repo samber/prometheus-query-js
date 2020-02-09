@@ -6,14 +6,14 @@
 
 > A Javascript client for Prometheus **query** and admin API.
 
-> ⚠️ This library does not export metrics. Please use [prom-client](https://github.com/siimon/prom-client) instead.
-
 ## ✨ Features
 
 - Thin & **minimal low-level HTTP client** to interact with Prometheus's API
 - Works both on the **browser** and **node.js**
 - **UMD compatible**, you can use it with any module loader
 - Supports **query** and admin [APIs](https://prometheus.io/docs/prometheus/latest/querying/api/)
+
+⚠️ This library does not export metrics. Please use [prom-client](https://github.com/siimon/prom-client) instead.
 
 ## 🚀 Install
 

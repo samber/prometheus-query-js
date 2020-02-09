@@ -108,7 +108,7 @@ Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001
 npm run test
 ```
 
-## Contribute
+## 🤝 Contributing
 
 The Prometheus Query client is open source and contributions from community (you!) are welcomed.
 
@@ -121,7 +121,7 @@ There are many ways to contribute: writing code, documentation, reporting issues
 * Twitter: [@samuelberthe](https://twitter.com/samuelberthe)
 * Github: [@samber](https://github.com/samber)
 
-## Show your support
+## 💫 Show your support
 
 Give a ⭐️ if this project helped you!
 

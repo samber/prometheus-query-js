@@ -1435,12 +1435,12 @@
        * `options` has the following fields:
        *      - endpoint: base path of Prometheus instance
        *      - headers: headers to be sent (k/v format)
-       *      - auth: {username: 'foo', password: 'bar'}: basic auth 
+       *      - auth: {username: 'foo', password: 'bar'}: basic auth
        *      - proxy: {host: '127.0.0.1', port: 9000}: hostname and port of a proxy server
        *      - withCredentials: indicates whether or not cross-site Access-Control requests
        *      - timeout: number of milliseconds before the request times out
        *      - warningHook: a hook for handling warning messages
-       * @param {*} options 
+       * @param {*} options
        */
       constructor(options) {
           options = options || {};
@@ -1520,7 +1520,7 @@
       }
 
       static metricToReadable(metric) {
-          const name = metric['__name__'];
+          const name = !!metric['__name__'] ? metric['__name__'] : '';
           const labels = Object.assign({}, metric);
 
           // renders readable serie name and labels

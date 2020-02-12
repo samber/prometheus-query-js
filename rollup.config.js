@@ -27,7 +27,7 @@ export default [
     // `file` and `format` for each target)
     {
         input: 'src/main.js',
-        external: ['ms'],
+        external: [],
         output: [{
                 file: pkg.main,
                 format: 'cjs'

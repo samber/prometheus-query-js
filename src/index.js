@@ -1,4 +1,11 @@
 import axios from "axios";
+import {
+    QueryResult,
+    Metric,
+    Target,
+    RuleGroup,
+    Alert,
+} from './models';
 
 export default class PrometheusQuery {
 
@@ -68,7 +75,8 @@ export default class PrometheusQuery {
         if (!!this.warningHook && !!response['warnings'] && response['warnings'].length > 0)
             this.warningHook(response['warnings']);
 
-        if (!response.data || !response.data.status)
+        const data = response.data;
+        if (!data || data.status == null)
             throw {
                 status: 'error',
                 errorType: 'client_error',
@@ -77,7 +85,11 @@ export default class PrometheusQuery {
 
         if (err)
             throw response;
-        return response['data'];
+
+        // deserialize to QueryResult when necessary
+        // if (typeof (data) == 'object' && !!data['data'] && !!data['data']['resultType'])
+        //     return QueryResult.fromJSON(data['data']);
+        return data['data'];
     }
 
     formatTimeToPrometheus(input, dEfault) {
@@ -91,15 +103,16 @@ export default class PrometheusQuery {
         throw new Error("Wrong time format. Expected number or Date.");
     }
 
-    static metricToReadable(metric) {
-        const name = !!metric['__name__'] ? metric['__name__'] : '';
-        const labels = Object.assign({}, metric);
+    // @DEPRECATED
+    // static metricToReadable(metric) {
+    //     const name = !!metric['__name__'] ? metric['__name__'] : '';
+    //     const labels = Object.assign({}, metric);
 
-        // renders readable serie name and labels
-        delete labels['__name__'];
-        const strLabels = Object.keys(labels).map((curr) => curr + '="' + labels[curr] + '"');
-        return name + '{' + strLabels.join(', ') + '}';
-    }
+    //     // renders readable serie name and labels
+    //     delete labels['__name__'];
+    //     const strLabels = Object.keys(labels).map((curr) => curr + '="' + labels[curr] + '"');
+    //     return name + '{' + strLabels.join(', ') + '}';
+    // }
 
     /***********************  EXPRESSION QUERIES  ***********************/
 
@@ -113,7 +126,8 @@ export default class PrometheusQuery {
             query: query,
             time: this.formatTimeToPrometheus(time, new Date()),
         };
-        return this.request("GET", "query", params, null);
+        return this.request("GET", "query", params, null)
+            .then((data) => QueryResult.fromJSON(data));
     }
 
     /**
@@ -130,7 +144,8 @@ export default class PrometheusQuery {
             end: this.formatTimeToPrometheus(end),
             step: step,
         };
-        return this.request("GET", "query_range", params, null);
+        return this.request("GET", "query_range", params, null)
+            .then((data) => QueryResult.fromJSON(data));
     }
 
     /***********************  METADATA API  ***********************/
@@ -143,11 +158,12 @@ export default class PrometheusQuery {
      */
     series(matchs, start, end) {
         const params = {
-            match: matchs,
+            'match[]': matchs,
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };
-        return this.request("GET", "series", params, null);
+        return this.request("GET", "series", params, null)
+            .then((data) => data.map(Metric.fromJSON));
     }
 
     /**
@@ -173,7 +189,13 @@ export default class PrometheusQuery {
         const params = {
             query: state || 'any',
         };
-        return this.request("GET", "targets", params, null);
+        return this.request("GET", "targets", params, null)
+            .then((data) => {
+                return {
+                    'activeTargets': !!data['activeTargets'] ? data['activeTargets'].map(Target.fromJSON) : [],
+                    'droppedTargets': !!data['droppedTargets'] ? data['droppedTargets'].map(Target.fromJSON) : [],
+                };
+            });
     }
 
     /**
@@ -210,14 +232,16 @@ export default class PrometheusQuery {
      * Getting a list of alerting and recording rules
      */
     rules() {
-        return this.request("GET", "rules", null, null);
+        return this.request("GET", "rules", null, null)
+            .then((data) => (!!data['groups'] ? data['groups'] : []).map(RuleGroup.fromJSON));
     }
 
     /**
      * Returns a list of all active alerts.
      */
     alerts() {
-        return this.request("GET", "alerts", null, null);
+        return this.request("GET", "alerts", null, null)
+            .then((data) => (!!data['alerts'] ? data['alerts'] : []).map(Alert.fromJSON));
     }
 
     /**
@@ -291,7 +315,7 @@ export default class PrometheusQuery {
      */
     adminDeleteSeries(matchs, start, end) {
         const params = {
-            match: matchs,
+            'match[]': matchs,
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };

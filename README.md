@@ -47,13 +47,14 @@ const pq = new PrometheusQuery({
 
 ```js
 // last `up` value
-pq.instantQuery('up{instance="demo.robustperception.io:9100",job="node"}')
+const q = 'up{instance="demo.robustperception.io:9100",job="node"}';
+pq.instantQuery(q)
     .then((res) => {
         const series = res.data.result;
         series.forEach((serie) => {
-            console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
-            console.log("Time:", new Date(serie.value[0] * 1000));
-            console.log("Value:", serie.value[1]);
+            console.log("Serie:", serie.metric.toString());
+            console.log("Time:", serie.value.time);
+            console.log("Value:", serie.value.value);
         });
     })
     .catch(console.error);
@@ -63,7 +64,7 @@ Output:
 
 ```txt
 Serie: up{instance="demo.robustperception.io:9100", job="node"}
-Time: Sun Feb 09 2020 22:04:41 GMT+0100 (Central European Standard Time)
+Time: Sun Feb 16 2020 18:33:59 GMT+0100 (Central European Standard Time)
 Value: 1
 ```
 
@@ -71,12 +72,17 @@ Value: 1
 
 ```js
 // up during past 24h, 1 point every 6 hours
-pq.rangeQuery("up", new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 60 * 60)
+const q = 'up';
+const start = new Date().getTime() - 24 * 60 * 60 * 1000;
+const end = new Date();
+const step = 6 * 60 * 60;
+
+pq.rangeQuery(q, start, end, step)
     .then((res) => {
         const series = res.data.result;
         series.forEach((serie) => {
-            console.log("Serie:", PrometheusQuery.metricToReadable(serie.metric));
-            console.log("Values:", JSON.stringify(serie.values));
+            console.log("Serie:", serie.metric.toString());
+            console.log("Values:\n" + serie.values.join('\n'));
         });
     })
     .catch(console.error);
@@ -86,16 +92,103 @@ Output:
 
 ```txt
 Serie: up{instance="demo.robustperception.io:9090", job="prometheus"}
-Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001.66,"1"],[1581282601.66,"1"]]
+Values:
+Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
 Serie: up{instance="demo.robustperception.io:9091", job="pushgateway"}
-Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001.66,"1"],[1581282601.66,"1"]]
+Values: 
+Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
 Serie: up{instance="demo.robustperception.io:9093", job="alertmanager"}
-Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001.66,"1"],[1581282601.66,"1"]]
+Values:
+Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
 Serie: up{instance="demo.robustperception.io:9100", job="node"}
-Values: [[1581196201.66,"1"],[1581217801.66,"1"],[1581239401.66,"1"],[1581261001.66,"1"],[1581282601.66,"1"]]
+Values:
+Sat Feb 15 2020 18:20:51 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 00:20:51 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 06:20:51 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 12:20:51 GMT+0100 (Central European Standard Time): 1
+Sun Feb 16 2020 18:20:51 GMT+0100 (Central European Standard Time): 1
+```
+
+### List series matching query
+
+```js
+const match = 'up';
+const start = new Date().getTime() - 24 * 60 * 60 * 1000;
+const end = new Date();
+
+pq.series(match, start, end)
+    .then((res) => {
+        console.log('Series:');
+        console.log(res.join('\n'));
+    })
+    .catch(console.error);
+```
+
+Output:
+
+```txt
+up{instance="demo.robustperception.io:9090", job="prometheus"}
+up{instance="demo.robustperception.io:9091", job="pushgateway"}
+up{instance="demo.robustperception.io:9093", job="alertmanager"}
+up{instance="demo.robustperception.io:9100", job="node"}
+```
+
+### List all active alerts
+
+```js
+pq.alerts()
+    .then(console.log)
+    .catch(console.error);
+```
+
+Output:
+
+```js
+[
+  Alert {
+    activeAt: 2019-11-14T20:04:36.629Z,
+    annotations: {},
+    labels: { alertname: 'ExampleAlertAlwaysFiring', job: 'alertmanager' },
+    state: 'firing',
+    value: 1
+  },
+  Alert {
+    activeAt: 2019-11-14T20:04:36.629Z,
+    annotations: {},
+    labels: { alertname: 'ExampleAlertAlwaysFiring', job: 'node' },
+    state: 'firing',
+    value: 1
+  },
+  Alert {
+    activeAt: 2019-11-14T20:04:36.629Z,
+    annotations: {},
+    labels: { alertname: 'ExampleAlertAlwaysFiring', job: 'prometheus' },
+    state: 'firing',
+    value: 1
+  },
+  Alert {
+    activeAt: 2019-11-14T20:04:36.629Z,
+    annotations: {},
+    labels: { alertname: 'ExampleAlertAlwaysFiring', job: 'pushgateway' },
+    state: 'firing',
+    value: 1
+  }
+]
 ```
 
 ## 🏋️‍♂️ Documentation

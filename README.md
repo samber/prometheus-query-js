@@ -50,7 +50,7 @@ const pq = new PrometheusQuery({
 const q = 'up{instance="demo.robustperception.io:9100",job="node"}';
 pq.instantQuery(q)
     .then((res) => {
-        const series = res.data.result;
+        const series = res.result;
         series.forEach((serie) => {
             console.log("Serie:", serie.metric.toString());
             console.log("Time:", serie.value.time);
@@ -79,7 +79,7 @@ const step = 6 * 60 * 60;
 
 pq.rangeQuery(q, start, end, step)
     .then((res) => {
-        const series = res.data.result;
+        const series = res.result;
         series.forEach((serie) => {
             console.log("Serie:", serie.metric.toString());
             console.log("Values:\n" + serie.values.join('\n'));

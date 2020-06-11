@@ -267,7 +267,8 @@ class PrometheusQuery {
     /**
      * Creates a PrometheusQuery client
      * `options` has the following fields:
-     *      - endpoint: base path of Prometheus instance
+     *      - endpoint: address of Prometheus instance
+     *      - baseURL: base path of Prometheus API (default: /api/v1)
      *      - headers: headers to be sent (k/v format)
      *      - auth: {username: 'foo', password: 'bar'}: basic auth
      *      - proxy: {host: '127.0.0.1', port: 9000}: hostname and port of a proxy server
@@ -282,6 +283,7 @@ class PrometheusQuery {
             throw "Endpoint is required";
 
         this.endpoint = options.endpoint.replace(/\/$/, "");
+        this.baseURL = options.baseURL || "/api/v1/";
         this.headers = options.headers || {};
         this.auth = options.auth || {};
         this.proxy = options.proxy || {};
@@ -293,7 +295,7 @@ class PrometheusQuery {
 
     request(method, uri, params, body) {
         const req = axios.request({
-            baseURL: this.endpoint + "/api/v1/",
+            baseURL: this.endpoint + this.baseURL,
             url: uri,
             method: method,
             params: params,

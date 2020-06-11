@@ -40,6 +40,7 @@ const PrometheusQuery = require('prometheus-query');
 
 const pq = new PrometheusQuery({
     endpoint: "http://demo.robustperception.io:9090",
+    baseURL: "/api/v1" // default value
 });
 ```
 
@@ -71,11 +72,11 @@ Value: 1
 ### Range query
 
 ```js
-// up during past 24h, 1 point every 6 hours
+// up during past 24h
 const q = 'up';
 const start = new Date().getTime() - 24 * 60 * 60 * 1000;
 const end = new Date();
-const step = 6 * 60 * 60;
+const step = 6 * 60 * 60; // 1 point every 6 hours
 
 pq.rangeQuery(q, start, end, step)
     .then((res) => {
@@ -100,7 +101,7 @@ Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
 Serie: up{instance="demo.robustperception.io:9091", job="pushgateway"}
-Values: 
+Values:
 Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
@@ -203,9 +204,9 @@ npm run test
 
 ## 🔐 Security advisory
 
-If you open a Prometheus instance on Internet, it would be a good idea to block some routes. 
+If you open a Prometheus instance on Internet, it would be a good idea to block some routes.
 
-Start by blocking /api/v1/admin. I'm pretty sure allowing only /api/v1/query and /api/v1/query_range will match your needs.
+Start by blocking `/api/v1/admin`. I'm pretty sure allowing only `/api/v1/query` and `/api/v1/query_range` will match your needs.
 
 Also don't use Prometheus as a multitenant timeseries database!
 
@@ -213,7 +214,7 @@ At your own risk... 😘
 
 ## 🤝 Contributing
 
-The Prometheus Query client is open source and contributions from community (you!) are welcomed.
+The Prometheus Query client is open source and contributions from community (you!) are welcome.
 
 There are many ways to contribute: writing code, documentation, reporting issues...
 
@@ -234,4 +235,4 @@ Give a ⭐️ if this project helped you!
 
 Copyright © 2020 [Samuel Berthe](https://github.com/samber).
 
-This project is [MIT](https://github.com/samber/prometheus-query-js/blob/master/LICENSE) licensed.
+This project is [MIT](./LICENSE) licensed.

@@ -1,7 +1,7 @@
 {
     "name": "prometheus-query",
     "description": "A Javascript client for Prometheus query API",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "main": "dist/prometheus-query.cjs.js",
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",
@@ -19,6 +19,13 @@
         "dev": "rollup -c -w",
         "test": "node test/test.js",
         "pretest": "npm run build"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/samber/prometheus-query-js.git"
+    },
+    "bugs": {
+      "url": "https://github.com/samber/prometheus-query-js/issues"
     },
     "files": [
         "dist"

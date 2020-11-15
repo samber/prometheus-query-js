@@ -1,7 +1,7 @@
 {
     "name": "prometheus-query",
     "description": "A Javascript client for Prometheus query API",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "main": "dist/prometheus-query.cjs.js",
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",
@@ -20,6 +20,7 @@
         "test": "node test/test.js",
         "pretest": "npm run build"
     },
+    "license": "MIT",
     "repository": {
       "type": "git",
       "url": "https://github.com/samber/prometheus-query-js.git"

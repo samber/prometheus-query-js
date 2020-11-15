@@ -214,7 +214,7 @@ At your own risk... 😘
 
 ## 🤝 Contributing
 
-The Prometheus Query client is open source and contributions from community (you!) are welcome.
+The Prometheus Query client is open source and contributions from the community (you!) are welcome.
 
 There are many ways to contribute: writing code, documentation, reporting issues...
 

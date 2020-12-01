@@ -1725,10 +1725,10 @@
               params: params,
               data: body,
               headers: this.headers,
-              auth: {
+              auth: (!!this.auth.username && !!this.auth.password) ? {
                   username: this.auth.username,
                   password: this.auth.password
-              },
+              } : null,
               proxy: (!!this.proxy.host && !!this.proxy.port) ? {
                   host: this.proxy.host,
                   port: this.proxy.port

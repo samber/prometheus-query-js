@@ -6,7 +6,7 @@
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",
     "dependencies": {
-        "axios": "^0.19.2"
+        "axios": "^0.21.1"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^11.0.1",

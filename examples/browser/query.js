@@ -1,11 +1,11 @@
-const pq = new PrometheusQuery({
+const prom = new Prometheus.PrometheusDriver({
     endpoint: "http://demo.robustperception.io:9090/",
 });
 
 const query = window.prompt("Please write a Prometheus query here", "up{}")
 
 // last `up` value
-pq.instantQuery(query)
+prom.instantQuery(query)
     .then((res) => {
         console.log("****************", "[instantQuery] Query:", query, "****************")
         console.log("\n");
@@ -21,7 +21,7 @@ pq.instantQuery(query)
     .catch(console.error);
 
 // up during past 24h, 1 point every 6 hours
-pq.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 60 * 60)
+prom.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 60 * 60)
     .then((res) => {
         console.log("****************", "[rangeQuery] Query:", query, "****************");
         console.log("\n");
@@ -36,7 +36,7 @@ pq.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 *
     .catch(console.error);
 
 // list series matching query
-pq.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
+prom.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
     .then((res) => {
         console.log("****************", "[series] matching:", query, "****************");
         console.log('[series] Series:');
@@ -46,7 +46,7 @@ pq.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
     .catch(console.error);
 
 // list all active alerts
-pq.alerts()
+prom.alerts()
     .then((res) => {
         console.log("****************", "[alerts]", "****************");
         console.log(res)

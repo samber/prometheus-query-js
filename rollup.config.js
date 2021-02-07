@@ -1,21 +1,40 @@
 import resolve from '@rollup/plugin-node-resolve';
+import typescript from 'rollup-plugin-typescript2';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 export default [
     // browser-friendly UMD build
+    // https://remarkablemark.org/blog/2019/07/12/rollup-commonjs-umd/
     {
-        input: 'src/index.js',
-        output: {
-            name: 'PrometheusQuery',
-            file: pkg.browser,
-            format: 'umd'
-        },
+        input: 'src/index.ts',
+        output:  [
+            {
+                exports: 'named',
+                name: 'Prometheus',
+                file: pkg.browser,
+                format: 'umd',
+                sourcemap: true,
+            },
+        ],
+        external: [],
         plugins: [
+            json(),
+            // so Rollup can find `axios`
             resolve({
                 browser: true
-            }), // so Rollup can find `axios`
-            commonjs(), // so Rollup can convert `axios` to an ES module
+            }),
+            typescript({
+                useTsconfigDeclarationDir: true,
+                tsconfigOverride: { compilerOptions : { module: 'es2015' } }
+            }),
+            // so Rollup can convert `axios` to an ES module
+            commonjs({
+                extensions: ['.js', '.ts']
+            }),
+            terser(),
         ],
     },
 
@@ -26,16 +45,23 @@ export default [
     // an array for the `output` option, where we can specify
     // `file` and `format` for each target)
     {
-        input: 'src/index.js',
+        input: 'src/index.ts',
         external: [],
         output: [{
                 file: pkg.main,
-                format: 'cjs'
+                format: 'cjs',
+                sourcemap: true,
             },
             {
                 file: pkg.module,
-                format: 'es'
+                format: 'es',
+                sourcemap: true,
             }
-        ]
+        ],
+        plugins: [
+            typescript({
+                tsconfigOverride: { compilerOptions : { module: "es2015" } },
+            }),
+        ],
     }
 ];

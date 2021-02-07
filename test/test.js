@@ -1,1 +1,1 @@
-const PrometheusQuery = require('..');
+const Prometheus = require('..');

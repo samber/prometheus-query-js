@@ -1,15 +1,16 @@
-const PrometheusQuery = require('../../');
 
-const pq = new PrometheusQuery({
-    endpoint: "http://demo.robustperception.io:9090/",
+import { PrometheusDriver, Alert, Metric, QueryResult } from '../../';
+
+const prom = new PrometheusDriver({
+    endpoint: 'http://demo.robustperception.io:9090/',
 });
 
 const query = 'up{instance="demo.robustperception.io:9100",job="node"}';
 // const query = 'up{}';
 
 // last value
-pq.instantQuery(query)
-    .then((res) => {
+prom.instantQuery(query, null)
+    .then((res: QueryResult) => {
         console.log("****************", "[instantQuery] Query:", query, "****************")
         console.log("\n");
 
@@ -24,8 +25,8 @@ pq.instantQuery(query)
     .catch(console.error);
 
 // during past 24h, 1 point every 6 hours
-pq.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 60 * 60)
-    .then((res) => {
+prom.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 * 60 * 60)
+    .then((res: QueryResult) => {
         console.log("****************", "[rangeQuery] Query:", query, "****************");
         console.log("\n");
 
@@ -40,8 +41,8 @@ pq.rangeQuery(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date(), 6 *
 
 
 // list series matching query
-pq.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
-    .then((res) => {
+prom.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
+    .then((res: Metric[]) => {
         console.log("****************", "[series] matching:", query, "****************");
         console.log('[series] Series:');
         console.log(res.join('\n'));
@@ -50,8 +51,8 @@ pq.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
     .catch(console.error);
 
 // list all active alerts
-pq.alerts()
-    .then((res) => {
+prom.alerts()
+    .then((res: Alert[]) => {
         console.log("****************", "[alerts]", "****************");
         console.log(res)
         console.log("\n");

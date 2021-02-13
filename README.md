@@ -23,22 +23,31 @@
 npm install prometheus-query
 ```
 
+### Upgrade from v2 to v3
+
+- `prometheus-query-js` has been recoded into Typescript.
+- Type definitions.
+- API update:
+  - `PrometheusQuery` is not the default export anymore.
+  - `PrometheusQuery` has been renamed as `PrometheusDriver`.
+  - [See examples](./examples/nodejs/app.ts)
+
 ### Browser
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/prometheus-query/dist/prometheus-query.umd.min.js"></script>
 
 <script type="application/javacript">
-	const pq = new PrometheusQuery(...);
+	const prom = new Prometheus.PrometheusDriver(...);
 </script>
 ```
 
 ## 💡 Quick start
 
 ```js
-const PrometheusQuery = require('prometheus-query');
+import { PrometheusDriver } from 'prometheus-query';
 
-const pq = new PrometheusQuery({
+const prom = new PrometheusDriver({
     endpoint: "http://demo.robustperception.io:9090",
     baseURL: "/api/v1" // default value
 });
@@ -49,7 +58,7 @@ const pq = new PrometheusQuery({
 ```js
 // last `up` value
 const q = 'up{instance="demo.robustperception.io:9100",job="node"}';
-pq.instantQuery(q)
+prom.instantQuery(q)
     .then((res) => {
         const series = res.result;
         series.forEach((serie) => {
@@ -78,7 +87,7 @@ const start = new Date().getTime() - 24 * 60 * 60 * 1000;
 const end = new Date();
 const step = 6 * 60 * 60; // 1 point every 6 hours
 
-pq.rangeQuery(q, start, end, step)
+prom.rangeQuery(q, start, end, step)
     .then((res) => {
         const series = res.result;
         series.forEach((serie) => {
@@ -132,7 +141,7 @@ const match = 'up';
 const start = new Date().getTime() - 24 * 60 * 60 * 1000;
 const end = new Date();
 
-pq.series(match, start, end)
+prom.series(match, start, end)
     .then((res) => {
         console.log('Series:');
         console.log(res.join('\n'));
@@ -152,7 +161,7 @@ up{instance="demo.robustperception.io:9100", job="node"}
 ### List all active alerts
 
 ```js
-pq.alerts()
+prom.alerts()
     .then(console.log)
     .catch(console.error);
 ```
@@ -217,6 +226,26 @@ At your own risk... 😘
 The Prometheus Query client is open source and contributions from the community (you!) are welcome.
 
 There are many ways to contribute: writing code, documentation, reporting issues...
+
+### Build and run
+
+```bash
+npm run dev
+```
+
+NodeJS:
+
+```bash
+npx ts-node examples/nodejs/app.ts
+```
+
+In browser:
+
+```bash
+docker run --rm -it -p 8080:80 -v `pwd`:/usr/share/nginx/html nginx
+
+# Then open http://localhost:8080/examples/browser
+```
 
 ## Author
 

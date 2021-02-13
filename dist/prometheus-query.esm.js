@@ -471,5 +471,5 @@ class PrometheusDriver {
     }
 }
 
-export { PrometheusConnectionOptions, PrometheusDriver };
+export { Alert, InstantVector, Metric, PrometheusConnectionOptions, PrometheusDriver, QueryResult, RangeVector, ResponseType, Rule, RuleGroup, SampleValue, Target };
 //# sourceMappingURL=prometheus-query.esm.js.map

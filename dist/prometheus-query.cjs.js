@@ -9,13 +9,12 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 
 // https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats
-var ResponseType;
 (function (ResponseType) {
     ResponseType["MATRIX"] = "matrix";
     ResponseType["VECTOR"] = "vector";
     ResponseType["SCALAR"] = "scalar";
     ResponseType["STRING"] = "string";
-})(ResponseType || (ResponseType = {}));
+})(exports.ResponseType || (exports.ResponseType = {}));
 class Metric {
     constructor(name, labels) {
         if (!!name && typeof (name) != 'string')
@@ -86,14 +85,14 @@ class QueryResult {
         const resultType = data['resultType'];
         let result = null;
         switch (resultType) {
-            case ResponseType.MATRIX:
+            case exports.ResponseType.MATRIX:
                 result = data['result'].map(RangeVector.fromJSON);
                 break;
-            case ResponseType.VECTOR:
+            case exports.ResponseType.VECTOR:
                 result = data['result'].map(InstantVector.fromJSON);
                 break;
-            case ResponseType.SCALAR:
-            case ResponseType.STRING:
+            case exports.ResponseType.SCALAR:
+            case exports.ResponseType.STRING:
                 result = data['result'];
                 break;
             default:
@@ -152,7 +151,7 @@ class Alert {
         this.value = value;
     }
     static fromJSON(obj) {
-        return new Alert(!!obj['activeAt'] ? new Date(obj['activeAt']) : null, obj['annotations'], obj['labels'], ResponseType[obj['state']], !!obj['value'] ? parseFloat(obj['value']) : null);
+        return new Alert(!!obj['activeAt'] ? new Date(obj['activeAt']) : null, obj['annotations'], obj['labels'], exports.ResponseType[obj['state']], !!obj['value'] ? parseFloat(obj['value']) : null);
     }
 }
 class Rule {
@@ -479,6 +478,15 @@ class PrometheusDriver {
     }
 }
 
+exports.Alert = Alert;
+exports.InstantVector = InstantVector;
+exports.Metric = Metric;
 exports.PrometheusConnectionOptions = PrometheusConnectionOptions;
 exports.PrometheusDriver = PrometheusDriver;
+exports.QueryResult = QueryResult;
+exports.RangeVector = RangeVector;
+exports.Rule = Rule;
+exports.RuleGroup = RuleGroup;
+exports.SampleValue = SampleValue;
+exports.Target = Target;
 //# sourceMappingURL=prometheus-query.cjs.js.map

@@ -23,6 +23,15 @@
 npm install prometheus-query
 ```
 
+### Upgrade from v2 to v3
+
+- `prometheus-query-js` has been recoded into Typescript.
+- Type definitions.
+- API update:
+  - `PrometheusQuery` is not the default export anymore.
+  - `PrometheusQuery` has been renamed as `PrometheusDriver`.
+  - [See examples](./examples/nodejs/app.ts)
+
 ### Browser
 
 ```html

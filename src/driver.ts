@@ -143,17 +143,6 @@ export class PrometheusDriver {
         throw new Error('Wrong time format. Expected number or Date.');
     }
 
-    // @DEPRECATED
-    // static metricToReadable(metric) {
-    //     const name = !!metric['__name__'] ? metric['__name__'] : '';
-    //     const labels = Object.assign({}, metric);
-
-    //     // renders readable serie name and labels
-    //     delete labels['__name__'];
-    //     const strLabels = Object.keys(labels).map((curr) => curr + '="' + labels[curr] + '"');
-    //     return name + '{' + strLabels.join(', ') + '}';
-    // }
-
     /***********************  EXPRESSION QUERIES  ***********************/
 
     /**

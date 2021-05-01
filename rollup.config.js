@@ -5,6 +5,13 @@ import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
+const banner = `/*!
+ * ${pkg.name} v${pkg.version}
+ * github.com/samber/prometheus-query-js
+ * (c) ${new Date().getFullYear()} prometheus-query-js Contributors
+ * Released under the MIT License
+ */`;
+
 export default [
     // browser-friendly UMD build
     // https://remarkablemark.org/blog/2019/07/12/rollup-commonjs-umd/
@@ -16,6 +23,7 @@ export default [
                 name: 'Prometheus',
                 file: pkg.browser,
                 format: 'umd',
+                banner,
                 sourcemap: true,
             },
         ],
@@ -47,7 +55,8 @@ export default [
     {
         input: 'src/index.ts',
         external: [],
-        output: [{
+        output: [
+            {
                 file: pkg.main,
                 format: 'cjs',
                 sourcemap: true,

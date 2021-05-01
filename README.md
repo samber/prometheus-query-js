@@ -15,6 +15,8 @@
 
 ⚠️ This library does not export metrics. Please use [prom-client](https://github.com/siimon/prom-client) instead.
 
+For building shiny Charts, you may like this chartjs plugin: [samber/chartjs-plugin-datasource-prometheus](https://github.com/samber/chartjs-plugin-datasource-prometheus).
+
 ## 🚀 Install
 
 ### NodeJS
@@ -201,15 +203,9 @@ Output:
 ]
 ```
 
-## 🏋️‍♂️ Documentation
+## 🏋️‍♂️ Documentation / API
 
 // @TODO
-
-## ✅ Run tests
-
-```sh
-npm run test
-```
 
 ## 🔐 Security advisory
 
@@ -227,25 +223,7 @@ The Prometheus Query client is open source and contributions from the community 
 
 There are many ways to contribute: writing code, documentation, reporting issues...
 
-### Build and run
-
-```bash
-npm run dev
-```
-
-NodeJS:
-
-```bash
-npx ts-node examples/nodejs/app.ts
-```
-
-In browser:
-
-```bash
-docker run --rm -it -p 8080:80 -v `pwd`:/usr/share/nginx/html nginx
-
-# Then open http://localhost:8080/examples/browser
-```
+[How-to](./CONTRIBUTING.md)
 
 ## Author
 

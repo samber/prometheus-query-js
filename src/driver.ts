@@ -64,13 +64,14 @@ export class PrometheusDriver {
     }
 
     private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uri: string, params?: object, body?: object): Promise<T> {
+        const headers = Object.assign(this.options.headers || {}, { 'Accept-Encoding': 'gzip' });
         const req = axios.request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,
             params: params,
             data: body,
-            headers: this.options.headers,
+            headers: headers,
             auth: (!!this.options.auth?.username && !!this.options.auth?.password) ? {
                 username: this.options.auth.username,
                 password: this.options.auth.password

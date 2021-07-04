@@ -203,9 +203,40 @@ Output:
 ]
 ```
 
-## 🏋️‍♂️ Documentation / API
+### Authenticated query
 
-// @TODO
+Using basic auth:
+
+```ts
+new PrometheusDriver({
+    endpoint: "http://demo.robustperception.io:9090",
+    auth: {
+        username: 'foo',
+        password: 'bar'
+    }
+});
+```
+
+Using cookies:
+
+```ts
+new PrometheusDriver({
+    endpoint: "http://demo.robustperception.io:9090",
+    withCredentials: true
+});
+```
+
+### Proxy
+
+```ts
+new PrometheusDriver({
+    endpoint: "http://demo.robustperception.io:9090",
+    proxy: {
+        host: 'proxy.acme.com',
+        port: 8080
+    }
+});
+```
 
 ## 🔐 Security advisory
 

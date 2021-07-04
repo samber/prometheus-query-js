@@ -31,19 +31,6 @@ export class PrometheusConnectionOptions {
     warningHook?: (any) => any = null;
 }
 
-// export class PrometheusConnectionOptions {
-//     constructor(
-//         endpoint: string,
-//         baseURL: string = '/api/v1/',
-//         headers: object = {},
-//         auth: PrometheusConnectionAuth = null,
-//         proxy: PrometheusConnectionProxy = null,
-//         withCredentials: boolean = false,
-//         timeout: number = 10000,    // ms
-//         warningHook: (any) => any = null,
-//     ) { }
-// }
-
 export type PrometheusQueryDate = Date | number;
 
 export class PrometheusDriver {

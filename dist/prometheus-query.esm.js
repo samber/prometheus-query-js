@@ -211,13 +211,14 @@ class PrometheusDriver {
     }
     request(method, uri, params, body) {
         var _a, _b, _c, _d, _e, _f;
+        const headers = Object.assign(this.options.headers || {}, { 'Accept-Encoding': 'gzip' });
         const req = axios.request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,
             params: params,
             data: body,
-            headers: this.options.headers,
+            headers: headers,
             auth: (!!((_a = this.options.auth) === null || _a === void 0 ? void 0 : _a.username) && !!((_b = this.options.auth) === null || _b === void 0 ? void 0 : _b.password)) ? {
                 username: this.options.auth.username,
                 password: this.options.auth.password
@@ -269,15 +270,6 @@ class PrometheusDriver {
             return input.getTime() / 1000;
         throw new Error('Wrong time format. Expected number or Date.');
     }
-    // @DEPRECATED
-    // static metricToReadable(metric) {
-    //     const name = !!metric['__name__'] ? metric['__name__'] : '';
-    //     const labels = Object.assign({}, metric);
-    //     // renders readable serie name and labels
-    //     delete labels['__name__'];
-    //     const strLabels = Object.keys(labels).map((curr) => curr + '="' + labels[curr] + '"');
-    //     return name + '{' + strLabels.join(', ') + '}';
-    // }
     /***********************  EXPRESSION QUERIES  ***********************/
     /**
      * Evaluates an instant query at a single point in time

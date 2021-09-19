@@ -64,7 +64,7 @@ export class PrometheusDriver {
     }
 
     private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uri: string, params?: object, body?: object): Promise<T> {
-        const headers = Object.assign(this.options.headers || {}, { 'Accept-Encoding': 'gzip' });
+        const headers = Object.assign({}, this.options.headers || {});
         const req = axios.request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,

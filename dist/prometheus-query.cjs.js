@@ -218,7 +218,7 @@ class PrometheusDriver {
     }
     request(method, uri, params, body) {
         var _a, _b, _c, _d, _e, _f;
-        const headers = Object.assign(this.options.headers || {}, { 'Accept-Encoding': 'gzip' });
+        const headers = Object.assign({}, this.options.headers || {});
         const req = axios__default['default'].request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,

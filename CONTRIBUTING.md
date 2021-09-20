@@ -10,7 +10,7 @@ npm run dev
 NodeJS:
 
 ```bash
-npx ts-node examples/nodejs/app.ts
+npm run example
 ```
 
 In browser:

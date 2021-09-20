@@ -2,10 +2,10 @@
 import { PrometheusDriver, Alert, Metric, QueryResult } from '../../';
 
 const prom = new PrometheusDriver({
-    endpoint: 'http://demo.robustperception.io:9090/',
+    endpoint: 'https://prometheus.demo.do.prometheus.io/',
 });
 
-const query = 'up{instance="demo.robustperception.io:9100",job="node"}';
+const query = 'up{instance="demo.do.prometheus.io:9090",job="prometheus"}';
 // const query = 'up{}';
 
 // last value

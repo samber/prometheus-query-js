@@ -9,6 +9,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 
 // https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats
+exports.ResponseType = void 0;
 (function (ResponseType) {
     ResponseType["MATRIX"] = "matrix";
     ResponseType["VECTOR"] = "vector";

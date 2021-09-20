@@ -1,5 +1,5 @@
 const prom = new Prometheus.PrometheusDriver({
-    endpoint: "http://demo.robustperception.io:9090/",
+    endpoint: "https://prometheus.demo.do.prometheus.io/",
 });
 
 const query = window.prompt("Please write a Prometheus query here", "up{}")

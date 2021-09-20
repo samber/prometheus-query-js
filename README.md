@@ -50,7 +50,7 @@ npm install prometheus-query
 import { PrometheusDriver } from 'prometheus-query';
 
 const prom = new PrometheusDriver({
-    endpoint: "http://demo.robustperception.io:9090",
+    endpoint: "https://prometheus.demo.do.prometheus.io",
     baseURL: "/api/v1" // default value
 });
 ```
@@ -59,7 +59,7 @@ const prom = new PrometheusDriver({
 
 ```js
 // last `up` value
-const q = 'up{instance="demo.robustperception.io:9100",job="node"}';
+const q = 'up{instance="demo.do.prometheus.io:9090",job="node"}';
 prom.instantQuery(q)
     .then((res) => {
         const series = res.result;
@@ -75,7 +75,7 @@ prom.instantQuery(q)
 Output:
 
 ```txt
-Serie: up{instance="demo.robustperception.io:9100", job="node"}
+Serie: up{instance="prometheus.demo.do.prometheus.io:9100", job="node"}
 Time: Sun Feb 16 2020 18:33:59 GMT+0100 (Central European Standard Time)
 Value: 1
 ```
@@ -103,7 +103,7 @@ prom.rangeQuery(q, start, end, step)
 Output:
 
 ```txt
-Serie: up{instance="demo.robustperception.io:9090", job="prometheus"}
+Serie: up{instance="prometheus.demo.do.prometheus.io:9090", job="prometheus"}
 Values:
 Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
@@ -111,7 +111,7 @@ Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
-Serie: up{instance="demo.robustperception.io:9091", job="pushgateway"}
+Serie: up{instance="prometheus.demo.do.prometheus.io:9093", job="alertmanager"}
 Values:
 Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
@@ -119,15 +119,7 @@ Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
 
-Serie: up{instance="demo.robustperception.io:9093", job="alertmanager"}
-Values:
-Sat Feb 15 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
-Sun Feb 16 2020 00:21:47 GMT+0100 (Central European Standard Time): 1
-Sun Feb 16 2020 06:21:47 GMT+0100 (Central European Standard Time): 1
-Sun Feb 16 2020 12:21:47 GMT+0100 (Central European Standard Time): 1
-Sun Feb 16 2020 18:21:47 GMT+0100 (Central European Standard Time): 1
-
-Serie: up{instance="demo.robustperception.io:9100", job="node"}
+Serie: up{instance="prometheus.demo.do.prometheus.io:9100", job="node"}
 Values:
 Sat Feb 15 2020 18:20:51 GMT+0100 (Central European Standard Time): 1
 Sun Feb 16 2020 00:20:51 GMT+0100 (Central European Standard Time): 1
@@ -154,10 +146,9 @@ prom.series(match, start, end)
 Output:
 
 ```txt
-up{instance="demo.robustperception.io:9090", job="prometheus"}
-up{instance="demo.robustperception.io:9091", job="pushgateway"}
-up{instance="demo.robustperception.io:9093", job="alertmanager"}
-up{instance="demo.robustperception.io:9100", job="node"}
+up{instance="demo.do.prometheus.io:9090", job="prometheus"}
+up{instance="demo.do.prometheus.io:9093", job="alertmanager"}
+up{instance="demo.do.prometheus.io:9100", job="node"}
 ```
 
 ### List all active alerts
@@ -209,7 +200,7 @@ Using basic auth:
 
 ```ts
 new PrometheusDriver({
-    endpoint: "http://demo.robustperception.io:9090",
+    endpoint: "https://prometheus.demo.do.prometheus.io",
     auth: {
         username: 'foo',
         password: 'bar'
@@ -221,7 +212,7 @@ Using cookies:
 
 ```ts
 new PrometheusDriver({
-    endpoint: "http://demo.robustperception.io:9090",
+    endpoint: "https://prometheus.demo.do.prometheus.io",
     withCredentials: true
 });
 ```
@@ -230,7 +221,7 @@ new PrometheusDriver({
 
 ```ts
 new PrometheusDriver({
-    endpoint: "http://demo.robustperception.io:9090",
+    endpoint: "https://prometheus.demo.do.prometheus.io",
     proxy: {
         host: 'proxy.acme.com',
         port: 8080

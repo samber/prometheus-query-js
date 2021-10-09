@@ -28,6 +28,7 @@ export class PrometheusConnectionOptions {
     proxy?: PrometheusConnectionProxy = null;
     withCredentials?: boolean = false;
     timeout?: number = 10000;    // ms
+    preferPost?: boolean = false;
     warningHook?: (any) => any = null;
 }
 
@@ -69,8 +70,8 @@ export class PrometheusDriver {
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,
-            params: params,
-            data: body,
+            params: this.formatPromQlParams(params),
+            data: this.formatPromQlParams(body),
             headers: headers,
             auth: (!!this.options.auth?.username && !!this.options.auth?.password) ? {
                 username: this.options.auth.username,
@@ -131,20 +132,42 @@ export class PrometheusDriver {
         throw new Error('Wrong time format. Expected number or Date.');
     }
 
+    private listifyIfNeeded = <T>(listOrNot: T | T[]): T[] =>
+        listOrNot instanceof Array ? listOrNot : [listOrNot]
+
+    private formatPromQlParams = (obj: any): URLSearchParams =>
+        Object.entries(obj ?? {}).reduce((usp, [key, value]) => {
+            if (value != null) {
+                if (value instanceof Array) {
+                    value.filter(v => v != null).forEach(v => usp.append(`${key}[]`, v))
+                } else {
+                    usp.append(key, value as any)
+                }
+            }
+            return usp
+        }, new URLSearchParams())
+
+
     /***********************  EXPRESSION QUERIES  ***********************/
 
     /**
      * Evaluates an instant query at a single point in time
      * @param {*} query Prometheus expression query string.
      * @param {*} time Evaluation Date object or number in milliseconds. Optional.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    public instantQuery(query: string, time?: PrometheusQueryDate): Promise<QueryResult> {
+    public instantQuery(query: string, time?: PrometheusQueryDate, timeout?: string): Promise<QueryResult> {
         const params = {
-            query: query,
+            query,
             time: this.formatTimeToPrometheus(time, new Date()),
-        };
-        return this.request('GET', 'query', params)
-            .then((data: object) => QueryResult.fromJSON(data));
+            timeout,
+        }
+
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'query', null, params)
+            : this.request('GET', 'query', params)
+
+        return response.then((data: object) => QueryResult.fromJSON(data))
     }
 
     /**
@@ -153,16 +176,22 @@ export class PrometheusDriver {
      * @param {*} start Start Date object or number in milliseconds.
      * @param {*} end End Date object or number in milliseconds.
      * @param {*} step Query resolution step width in number of seconds.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    public rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: number): Promise<QueryResult> {
+    public rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: number, timeout?: string): Promise<QueryResult> {
         const params = {
-            query: query,
+            query,
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
-            step: step,
-        };
-        return this.request('GET', 'query_range', params)
-            .then((data: object) => QueryResult.fromJSON(data));
+            step,
+            timeout: timeout,
+        }
+
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'query_range', null, params)
+            : this.request('GET', 'query_range', params)
+
+        return response.then((data: object) => QueryResult.fromJSON(data))
     }
 
     /***********************  METADATA API  ***********************/
@@ -175,27 +204,51 @@ export class PrometheusDriver {
      */
     public series(matchs: SerieSelector, start: PrometheusQueryDate, end: PrometheusQueryDate): Promise<Metric[]> {
         const params = {
-            'match[]': matchs,
+            match: this.listifyIfNeeded(matchs),
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };
-        return this.request<object[]>('GET', 'series', params)
-            .then((data: object[]) => data.map(Metric.fromJSON));
+
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'series', null, params)
+            : this.request('GET', 'series', params)
+
+        return response.then((data: object[]) => data.map(Metric.fromJSON))
     }
 
     /**
      * Getting label names
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    public labelNames(): Promise<any> {
-        return this.request('GET', 'labels');
+    public labelNames(matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]> {
+        const params = {
+            match: this.listifyIfNeeded(matchs),
+            start: this.formatTimeToPrometheus(start),
+            end: this.formatTimeToPrometheus(end),
+        }
+
+        return (this.options.preferPost)
+            ? this.request('POST', 'labels', null, params)
+            : this.request('GET', 'labels', params)
     }
 
     /**
-     * Querying label values
-     * @param {*} labelName This argument is not explicit ?
+     * Getting label values
+     * @param {*} labelName Label name to query values for.
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    public labelValues(labelName: string): Promise<any> {
-        return this.request('GET', `label/${labelName}/values`);
+    public labelValues(labelName: string, matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]> {
+        const params = {
+            match: this.listifyIfNeeded(matchs),
+            start: this.formatTimeToPrometheus(start),
+            end: this.formatTimeToPrometheus(end),
+        }
+
+        return this.request('GET', `label/${labelName}/values`, params)
     }
 
     /**
@@ -332,7 +385,7 @@ export class PrometheusDriver {
      */
     public adminDeleteSeries(matchs: SerieSelector, start: PrometheusQueryDate, end: PrometheusQueryDate): Promise<any> {
         const params = {
-            'match[]': matchs,
+            match: this.listifyIfNeeded(matchs),
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };

@@ -182,6 +182,7 @@ class PrometheusConnectionOptions {
         this.proxy = null;
         this.withCredentials = false;
         this.timeout = 10000; // ms
+        this.preferPost = false;
         this.warningHook = null;
     }
 }
@@ -200,6 +201,18 @@ class PrometheusDriver {
      * @param {*} options
      */
     constructor(options) {
+        this.listifyIfNeeded = (listOrNot) => listOrNot instanceof Array ? listOrNot : [listOrNot];
+        this.formatPromQlParams = (obj) => Object.entries(obj !== null && obj !== void 0 ? obj : {}).reduce((usp, [key, value]) => {
+            if (value != null) {
+                if (value instanceof Array) {
+                    value.filter(v => v != null).forEach(v => usp.append(`${key}[]`, v));
+                }
+                else {
+                    usp.append(key, value);
+                }
+            }
+            return usp;
+        }, new URLSearchParams());
         options = options || new PrometheusConnectionOptions();
         if (!options.endpoint)
             throw 'Endpoint is required';
@@ -216,8 +229,8 @@ class PrometheusDriver {
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,
-            params: params,
-            data: body,
+            params: this.formatPromQlParams(params),
+            data: this.formatPromQlParams(body),
             headers: headers,
             auth: (!!((_a = this.options.auth) === null || _a === void 0 ? void 0 : _a.username) && !!((_b = this.options.auth) === null || _b === void 0 ? void 0 : _b.password)) ? {
                 username: this.options.auth.username,
@@ -275,14 +288,18 @@ class PrometheusDriver {
      * Evaluates an instant query at a single point in time
      * @param {*} query Prometheus expression query string.
      * @param {*} time Evaluation Date object or number in milliseconds. Optional.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    instantQuery(query, time) {
+    instantQuery(query, time, timeout) {
         const params = {
-            query: query,
+            query,
             time: this.formatTimeToPrometheus(time, new Date()),
+            timeout,
         };
-        return this.request('GET', 'query', params)
-            .then((data) => QueryResult.fromJSON(data));
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'query', null, params)
+            : this.request('GET', 'query', params);
+        return response.then((data) => QueryResult.fromJSON(data));
     }
     /**
      * Evaluates an expression query over a range of time
@@ -290,16 +307,20 @@ class PrometheusDriver {
      * @param {*} start Start Date object or number in milliseconds.
      * @param {*} end End Date object or number in milliseconds.
      * @param {*} step Query resolution step width in number of seconds.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    rangeQuery(query, start, end, step) {
+    rangeQuery(query, start, end, step, timeout) {
         const params = {
-            query: query,
+            query,
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
-            step: step,
+            step,
+            timeout: timeout,
         };
-        return this.request('GET', 'query_range', params)
-            .then((data) => QueryResult.fromJSON(data));
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'query_range', null, params)
+            : this.request('GET', 'query_range', params);
+        return response.then((data) => QueryResult.fromJSON(data));
     }
     /***********************  METADATA API  ***********************/
     /**
@@ -310,25 +331,45 @@ class PrometheusDriver {
      */
     series(matchs, start, end) {
         const params = {
-            'match[]': matchs,
+            match: this.listifyIfNeeded(matchs),
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };
-        return this.request('GET', 'series', params)
-            .then((data) => data.map(Metric.fromJSON));
+        const response = (this.options.preferPost)
+            ? this.request('POST', 'series', null, params)
+            : this.request('GET', 'series', params);
+        return response.then((data) => data.map(Metric.fromJSON));
     }
     /**
      * Getting label names
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    labelNames() {
-        return this.request('GET', 'labels');
+    labelNames(matchs, start, end) {
+        const params = {
+            match: this.listifyIfNeeded(matchs),
+            start: this.formatTimeToPrometheus(start),
+            end: this.formatTimeToPrometheus(end),
+        };
+        return (this.options.preferPost)
+            ? this.request('POST', 'labels', null, params)
+            : this.request('GET', 'labels', params);
     }
     /**
-     * Querying label values
-     * @param {*} labelName This argument is not explicit ?
+     * Getting label values
+     * @param {*} labelName Label name to query values for.
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    labelValues(labelName) {
-        return this.request('GET', `label/${labelName}/values`);
+    labelValues(labelName, matchs, start, end) {
+        const params = {
+            match: this.listifyIfNeeded(matchs),
+            start: this.formatTimeToPrometheus(start),
+            end: this.formatTimeToPrometheus(end),
+        };
+        return this.request('GET', `label/${labelName}/values`, params);
     }
     /**
      * Overview of the current state of the Prometheus target discovery:
@@ -448,7 +489,7 @@ class PrometheusDriver {
      */
     adminDeleteSeries(matchs, start, end) {
         const params = {
-            'match[]': matchs,
+            match: this.listifyIfNeeded(matchs),
             start: this.formatTimeToPrometheus(start),
             end: this.formatTimeToPrometheus(end),
         };

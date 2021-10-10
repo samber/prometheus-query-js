@@ -15,6 +15,7 @@ export declare class PrometheusConnectionOptions {
     proxy?: PrometheusConnectionProxy;
     withCredentials?: boolean;
     timeout?: number;
+    preferPost?: boolean;
     warningHook?: (any: any) => any;
 }
 export declare type PrometheusQueryDate = Date | number;
@@ -37,21 +38,25 @@ export declare class PrometheusDriver {
     private request;
     private handleResponse;
     private formatTimeToPrometheus;
+    private listifyIfNeeded;
+    private formatPromQlParams;
     /***********************  EXPRESSION QUERIES  ***********************/
     /**
      * Evaluates an instant query at a single point in time
      * @param {*} query Prometheus expression query string.
      * @param {*} time Evaluation Date object or number in milliseconds. Optional.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    instantQuery(query: string, time?: PrometheusQueryDate): Promise<QueryResult>;
+    instantQuery(query: string, time?: PrometheusQueryDate, timeout?: string): Promise<QueryResult>;
     /**
      * Evaluates an expression query over a range of time
      * @param {*} query Prometheus expression query string.
      * @param {*} start Start Date object or number in milliseconds.
      * @param {*} end End Date object or number in milliseconds.
      * @param {*} step Query resolution step width in number of seconds.
+     * @param {*} timeout Evaluation timeout string. Optional.
      */
-    rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: number): Promise<QueryResult>;
+    rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: number, timeout?: string): Promise<QueryResult>;
     /***********************  METADATA API  ***********************/
     /**
      * Finding series by label matchers
@@ -62,13 +67,19 @@ export declare class PrometheusDriver {
     series(matchs: SerieSelector, start: PrometheusQueryDate, end: PrometheusQueryDate): Promise<Metric[]>;
     /**
      * Getting label names
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    labelNames(): Promise<any>;
+    labelNames(matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]>;
     /**
-     * Querying label values
-     * @param {*} labelName This argument is not explicit ?
+     * Getting label values
+     * @param {*} labelName Label name to query values for.
+     * @param {*} matchs Repeated series selector argument that selects the series to return. Optional.
+     * @param {*} start Start Date object or number in milliseconds. Optional.
+     * @param {*} end End Date object or number in milliseconds. Optional.
      */
-    labelValues(labelName: string): Promise<any>;
+    labelValues(labelName: string, matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]>;
     /**
      * Overview of the current state of the Prometheus target discovery:
      * @param {*} state Filter by target state. Can be 'active', 'dropped' or 'any'. Optional.

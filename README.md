@@ -255,6 +255,7 @@ new PrometheusDriver({
         }
     }
 });
+```
 
 ## 🔐 Security advisory
 

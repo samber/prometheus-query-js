@@ -1,3 +1,4 @@
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { QueryResult, Metric, RuleGroup, Alert, TargetState, SerieSelector } from './types';
 export declare type PrometheusConnectionAuth = {
     username: string;
@@ -16,11 +17,20 @@ export declare class PrometheusConnectionOptions {
     withCredentials?: boolean;
     timeout?: number;
     preferPost?: boolean;
+    requestInterceptor?: {
+        onFulfilled: (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>;
+        onRejected?: (error: any) => any;
+    };
+    responseInterceptor?: {
+        onFulfilled: (value: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
+        onRejected?: (error: any) => any;
+    };
     warningHook?: (any: any) => any;
 }
 export declare type PrometheusQueryDate = Date | number;
 export declare class PrometheusDriver {
     private options;
+    private axiosInstance;
     /**
      * Creates a PrometheusDriver client
      * `options` has the following fields:

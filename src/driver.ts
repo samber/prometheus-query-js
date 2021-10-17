@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import {
     QueryResult,
@@ -29,6 +29,16 @@ export class PrometheusConnectionOptions {
     withCredentials?: boolean = false;
     timeout?: number = 10000;    // ms
     preferPost?: boolean = false;
+
+    // hooks
+    requestInterceptor?: {
+        onFulfilled: (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>,
+        onRejected?: (error: any) => any,
+    };
+    responseInterceptor?: {
+        onFulfilled: (value: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>,
+        onRejected?: (error: any) => any,
+    };
     warningHook?: (any) => any = null;
 }
 
@@ -37,6 +47,7 @@ export type PrometheusQueryDate = Date | number;
 export class PrometheusDriver {
 
     private options: PrometheusConnectionOptions;
+    private axiosInstance: AxiosInstance;
 
     /**
      * Creates a PrometheusDriver client
@@ -62,11 +73,17 @@ export class PrometheusDriver {
         options.timeout = options.timeout || 10000;
 
         this.options = options;
+
+        this.axiosInstance = axios.create();
+        if (!!this.options.requestInterceptor)
+            this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
+        if (!!this.options.responseInterceptor)
+            this.axiosInstance.interceptors.request.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
     }
 
     private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uri: string, params?: object, body?: object): Promise<T> {
         const headers = Object.assign({}, this.options.headers || {});
-        const req = axios.request({
+        const req = this.axiosInstance.request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,
@@ -85,7 +102,7 @@ export class PrometheusDriver {
             timeout: this.options.timeout,
         });
         return req
-            .then((res: AxiosResponse<T>) => this.handleResponse<T>(res))
+            .then((res: AxiosResponse) => this.handleResponse<T>(res))
             .catch((res) => this.handleResponse<T>(res));
     }
 
@@ -133,7 +150,7 @@ export class PrometheusDriver {
     }
 
     private listifyIfNeeded = <T>(listOrNot: T | T[]): T[] =>
-        listOrNot instanceof Array ? listOrNot : [listOrNot]
+        listOrNot instanceof Array ? listOrNot : [listOrNot];
 
     private formatPromQlParams = (obj: any): URLSearchParams =>
         Object.entries(obj ?? {}).reduce((usp, [key, value]) => {
@@ -145,7 +162,7 @@ export class PrometheusDriver {
                 }
             }
             return usp
-        }, new URLSearchParams())
+        }, new URLSearchParams());
 
 
     /***********************  EXPRESSION QUERIES  ***********************/

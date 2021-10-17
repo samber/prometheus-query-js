@@ -229,6 +229,33 @@ new PrometheusDriver({
 });
 ```
 
+### Hook HTTP requests and responses
+
+```ts
+new PrometheusDriver({
+    endpoint: "https://prometheus.demo.do.prometheus.io",
+    proxy: {
+        host: 'proxy.acme.com',
+        port: 8080
+    },
+    requestInterceptor: {
+        onFulfilled: (config: AxiosRequestConfig) => {
+            return config;
+        },
+        onRejected: (error: any) => {
+            return Promise.reject(error.message);
+        }
+    },
+    responseInterceptor: {
+        onFulfilled: (res: AxiosResponse) => {
+            return res;
+        },
+        onRejected: (error: any) => {
+            return Promise.reject(error.message);
+        }
+    }
+});
+
 ## 🔐 Security advisory
 
 If you open a Prometheus instance on Internet, it would be a good idea to block some routes.

@@ -1,25 +1,25 @@
 {
     "name": "prometheus-query",
     "description": "A Javascript client for Prometheus query API",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "main": "dist/prometheus-query.cjs.js",
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",
     "types": "./dist/index.d.ts",
     "dependencies": {
-        "axios": "^0.22.0"
+        "axios": "^0.23.0"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^21.0.0",
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^13.0.5",
         "@rollup/plugin-replace": "^3.0.0",
-        "npm-check": "^5.9.2",
+        "npm-check": "^5",
         "rollup": "^2.58.0",
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.30.0",
-        "ts-node": "^10.2.1",
-        "typescript": "^4.4.3"
+        "ts-node": "^10.3.0",
+        "typescript": "^4.4.4"
     },
     "scripts": {
         "build": "rollup -c",

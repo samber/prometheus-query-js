@@ -229,11 +229,16 @@ class PrometheusDriver {
         options.withCredentials = options.withCredentials || false;
         options.timeout = options.timeout || 10000;
         this.options = options;
+        this.axiosInstance = axios__default["default"].create();
+        if (!!this.options.requestInterceptor)
+            this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
+        if (!!this.options.responseInterceptor)
+            this.axiosInstance.interceptors.request.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
     }
     request(method, uri, params, body) {
         var _a, _b, _c, _d, _e, _f;
         const headers = Object.assign({}, this.options.headers || {});
-        const req = axios__default['default'].request({
+        const req = this.axiosInstance.request({
             baseURL: this.options.endpoint + this.options.baseURL,
             url: uri,
             method: method,

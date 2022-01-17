@@ -7,7 +7,7 @@
     "browser": "dist/prometheus-query.umd.js",
     "types": "./dist/index.d.ts",
     "dependencies": {
-        "axios": "^0.23.0"
+        "axios": "^0.24.0"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^21.0.0",

@@ -78,7 +78,7 @@ export class PrometheusDriver {
         if (!!this.options.requestInterceptor)
             this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
         if (!!this.options.responseInterceptor)
-            this.axiosInstance.interceptors.request.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
+            this.axiosInstance.interceptors.response.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
     }
 
     private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uri: string, params?: object, body?: object): Promise<T> {

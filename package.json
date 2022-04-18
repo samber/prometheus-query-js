@@ -1,7 +1,7 @@
 {
     "name": "prometheus-query",
     "description": "A Javascript client for Prometheus query API",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "main": "dist/prometheus-query.cjs.js",
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",
@@ -10,16 +10,16 @@
         "axios": "^0.26.1"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^21.0.0",
+        "@rollup/plugin-commonjs": "^21.1.0",
         "@rollup/plugin-json": "^4.1.0",
-        "@rollup/plugin-node-resolve": "^13.0.5",
+        "@rollup/plugin-node-resolve": "^13.2.1",
         "@rollup/plugin-replace": "^4.0.0",
-        "npm-check": "^5.9.2",
-        "rollup": "^2.58.0",
+        "npm-check-updates": "^12.5.9",
+        "rollup": "^2.70.2",
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.31.2",
-        "ts-node": "^10.3.0",
-        "typescript": "^4.4.4"
+        "ts-node": "^10.7.0",
+        "typescript": "^4.6.3"
     },
     "scripts": {
         "build": "rollup -c",
@@ -27,7 +27,7 @@
         "test": "node test/test.js",
         "pretest": "npm run build",
         "example": "npx ts-node examples/nodejs/app.ts",
-        "upgrade": "npm-check -u"
+        "upgrade": "npx npm-check-updates"
     },
     "license": "MIT",
     "repository": {

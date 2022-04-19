@@ -371,8 +371,8 @@ class PrometheusDriver {
     labelValues(labelName, matchs, start, end) {
         const params = {
             match: this.listifyIfNeeded(matchs),
-            start: this.formatTimeToPrometheus(start),
-            end: this.formatTimeToPrometheus(end),
+            start: this.formatTimeToPrometheus(start, new Date()),
+            end: this.formatTimeToPrometheus(end, new Date()),
         };
         return this.request('GET', `label/${labelName}/values`, params);
     }

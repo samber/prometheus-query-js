@@ -192,10 +192,10 @@ export class PrometheusDriver {
      * @param {*} query Prometheus expression query string.
      * @param {*} start Start Date object or number in milliseconds.
      * @param {*} end End Date object or number in milliseconds.
-     * @param {*} step Query resolution step width in number of seconds.
+     * @param {*} step Query resolution step width in duration format or number of seconds.
      * @param {*} timeout Evaluation timeout string. Optional.
      */
-    public rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: number, timeout?: string): Promise<QueryResult> {
+    public rangeQuery(query: string, start: PrometheusQueryDate, end: PrometheusQueryDate, step: string | number, timeout?: string): Promise<QueryResult> {
         const params = {
             query,
             start: this.formatTimeToPrometheus(start),

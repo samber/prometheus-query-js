@@ -311,7 +311,7 @@ class PrometheusDriver {
      * @param {*} query Prometheus expression query string.
      * @param {*} start Start Date object or number in milliseconds.
      * @param {*} end End Date object or number in milliseconds.
-     * @param {*} step Query resolution step width in number of seconds.
+     * @param {*} step Query resolution step width in duration format or number of seconds.
      * @param {*} timeout Evaluation timeout string. Optional.
      */
     rangeQuery(query, start, end, step, timeout) {

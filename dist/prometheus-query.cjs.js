@@ -141,8 +141,8 @@ class Alert {
             throw new Error(`Unexpected format for annotations. Got ${typeof (annotations)} instead of object`);
         if (!!labels && typeof (labels) != 'object')
             throw new Error(`Unexpected format for labels. Got ${typeof (labels)} instead of object`);
-        // if (!!state && typeof (state) != 'TargetState')
-        //     throw new Error(`Unexpected format for state. Got ${typeof (state)} instead of string`);
+        // if (!!state && typeof (state) != 'AlertState')
+        // throw new Error(`Unexpected format for state. Got ${typeof (state)} instead of string`);
         if (!!value && typeof (value) != 'number')
             throw new Error(`Unexpected format for value. Got ${typeof (value)} instead of number`);
         this.activeAt = activeAt;
@@ -152,7 +152,7 @@ class Alert {
         this.value = value;
     }
     static fromJSON(obj) {
-        return new Alert(!!obj['activeAt'] ? new Date(obj['activeAt']) : null, obj['annotations'], obj['labels'], exports.ResponseType[obj['state']], !!obj['value'] ? parseFloat(obj['value']) : null);
+        return new Alert(!!obj['activeAt'] ? new Date(obj['activeAt']) : null, obj['annotations'], obj['labels'], obj['state'], !!obj['value'] ? parseFloat(obj['value']) : null);
     }
 }
 class Rule {

@@ -52,9 +52,9 @@ export declare class Alert {
     activeAt: Date;
     annotations: object;
     labels: object;
-    state: TargetState;
+    state: AlertState;
     value: number;
-    constructor(activeAt: Date, annotations: object, labels: object, state: TargetState, value: number);
+    constructor(activeAt: Date, annotations: object, labels: object, state: AlertState, value: number);
     static fromJSON(obj: any): Alert;
 }
 export declare class Rule {
@@ -79,3 +79,4 @@ export declare class RuleGroup {
 }
 export declare type SerieSelector = string | string[];
 export declare type TargetState = 'active' | 'dropped' | 'any';
+export declare type AlertState = 'firing' | 'pending' | 'inactive';

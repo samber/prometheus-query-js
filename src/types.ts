@@ -199,18 +199,18 @@ export class Alert {
     public activeAt: Date;
     public annotations: object;
     public labels: object;
-    public state: TargetState;
+    public state: AlertState;
     public value: number;
 
-    constructor(activeAt: Date, annotations: object, labels: object, state: TargetState, value: number) {
+    constructor(activeAt: Date, annotations: object, labels: object, state: AlertState, value: number) {
         if (!!activeAt && (typeof (activeAt) != 'object' || activeAt.constructor.name != 'Date'))
             throw new Error(`Unexpected format for activeAt. Got ${typeof (activeAt)} instead of object`);
         if (!!annotations && typeof (annotations) != 'object')
             throw new Error(`Unexpected format for annotations. Got ${typeof (annotations)} instead of object`);
         if (!!labels && typeof (labels) != 'object')
             throw new Error(`Unexpected format for labels. Got ${typeof (labels)} instead of object`);
-        // if (!!state && typeof (state) != 'TargetState')
-        //     throw new Error(`Unexpected format for state. Got ${typeof (state)} instead of string`);
+        // if (!!state && typeof (state) != 'AlertState')
+            // throw new Error(`Unexpected format for state. Got ${typeof (state)} instead of string`);
         if (!!value && typeof (value) != 'number')
             throw new Error(`Unexpected format for value. Got ${typeof (value)} instead of number`);
 
@@ -226,7 +226,7 @@ export class Alert {
             !!obj['activeAt'] ? new Date(obj['activeAt']) : null,
             obj['annotations'],
             obj['labels'],
-            ResponseType[obj['state']],
+            obj['state'],
             !!obj['value'] ? parseFloat(obj['value']) : null,
         );
     }
@@ -297,3 +297,4 @@ export class RuleGroup {
 
 export type SerieSelector = string | string[];
 export type TargetState = 'active' | 'dropped' | 'any';
+export type AlertState = 'firing' | 'pending' | 'inactive';

@@ -1,7 +1,7 @@
 {
     "name": "prometheus-query",
     "description": "A Javascript client for Prometheus query API",
-    "version": "3.3.3",
+    "version": "3.4.0",
     "main": "dist/prometheus-query.cjs.js",
     "module": "dist/prometheus-query.esm.js",
     "browser": "dist/prometheus-query.umd.js",

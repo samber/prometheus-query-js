@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 import {
     QueryResult,
@@ -31,14 +31,8 @@ export class PrometheusConnectionOptions {
     preferPost?: boolean = false;
 
     // hooks
-    requestInterceptor?: {
-        onFulfilled: (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>,
-        onRejected?: (error: any) => any,
-    };
-    responseInterceptor?: {
-        onFulfilled: (value: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>,
-        onRejected?: (error: any) => any,
-    };
+    requestInterceptor?: AxiosInterceptorManager<InternalAxiosRequestConfig>;
+    responseInterceptor?: AxiosInterceptorManager<AxiosResponse>;
     warningHook?: (any) => any = null;
 }
 
@@ -76,9 +70,9 @@ export class PrometheusDriver {
 
         this.axiosInstance = axios.create();
         if (!!this.options.requestInterceptor)
-            this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
+            this.axiosInstance.interceptors.request = this.options.requestInterceptor;
         if (!!this.options.responseInterceptor)
-            this.axiosInstance.interceptors.response.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
+           this.axiosInstance.interceptors.response = this.options.responseInterceptor;
     }
 
     private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uri: string, params?: object, body?: object): Promise<T> {

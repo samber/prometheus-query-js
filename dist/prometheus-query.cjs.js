@@ -231,9 +231,9 @@ class PrometheusDriver {
         this.options = options;
         this.axiosInstance = axios__default["default"].create();
         if (!!this.options.requestInterceptor)
-            this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
+            this.axiosInstance.interceptors.request = this.options.requestInterceptor;
         if (!!this.options.responseInterceptor)
-            this.axiosInstance.interceptors.response.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
+            this.axiosInstance.interceptors.response = this.options.responseInterceptor;
     }
     request(method, uri, params, body) {
         var _a, _b, _c, _d, _e, _f;

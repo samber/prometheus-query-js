@@ -1,4 +1,4 @@
-import { AxiosInterceptorManager, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { QueryResult, Metric, RuleGroup, Alert, TargetState, SerieSelector } from './types';
 export declare type PrometheusConnectionAuth = {
     username: string;
@@ -17,8 +17,14 @@ export declare class PrometheusConnectionOptions {
     withCredentials?: boolean;
     timeout?: number;
     preferPost?: boolean;
-    requestInterceptor?: AxiosInterceptorManager<InternalAxiosRequestConfig>;
-    responseInterceptor?: AxiosInterceptorManager<AxiosResponse>;
+    requestInterceptor?: {
+        onFulfilled: (value: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>;
+        onRejected?: (error: any) => any;
+    };
+    responseInterceptor?: {
+        onFulfilled: (value: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
+        onRejected?: (error: any) => any;
+    };
     warningHook?: (any: any) => any;
 }
 export declare type PrometheusQueryDate = Date | number;

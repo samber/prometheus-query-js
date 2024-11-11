@@ -120,7 +120,7 @@ export class PrometheusDriver {
 
         if (!!this.options.warningHook && !!response['warnings'] && response['warnings'].length > 0)
             this.options.warningHook(response['warnings']);
-
+        
         const data = (response as any).data;
         if (!data || data.status == null)
             throw {
@@ -146,6 +146,7 @@ export class PrometheusDriver {
             return input / 1000;
         else if (typeof (input) == 'object' && input?.constructor?.name == 'Date')
             return input.getTime() / 1000;
+
         throw new Error('Wrong time format. Expected number or Date.');
     }
 
@@ -242,8 +243,8 @@ export class PrometheusDriver {
     public labelNames(matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]> {
         const params = {
             match: this.listifyIfNeeded(matchs),
-            start: this.formatTimeToPrometheus(start),
-            end: this.formatTimeToPrometheus(end),
+            start: start ? this.formatTimeToPrometheus(start): undefined,
+            end: end ? this.formatTimeToPrometheus(end) : undefined,
         }
 
         return (this.options.preferPost)
@@ -261,8 +262,8 @@ export class PrometheusDriver {
     public labelValues(labelName: string, matchs?: SerieSelector, start?: PrometheusQueryDate, end?: PrometheusQueryDate): Promise<string[]> {
         const params = {
             match: this.listifyIfNeeded(matchs),
-            start: this.formatTimeToPrometheus(start, new Date()),
-            end: this.formatTimeToPrometheus(end, new Date()),
+            start: start ? this.formatTimeToPrometheus(start) : undefined,
+            end: end ? this.formatTimeToPrometheus(end) : undefined,
         }
 
         return this.request('GET', `label/${labelName}/values`, params)

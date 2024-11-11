@@ -3,6 +3,7 @@ import { PrometheusDriver, Alert, Metric, QueryResult } from '../../';
 
 const prom = new PrometheusDriver({
     endpoint: 'https://prometheus.demo.do.prometheus.io/',
+    // endpoint: 'http://localhost:9090/',
 });
 
 const query = 'up{instance="demo.do.prometheus.io:9090",job="prometheus"}';

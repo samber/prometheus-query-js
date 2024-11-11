@@ -362,8 +362,8 @@ class PrometheusDriver {
     labelNames(matchs, start, end) {
         const params = {
             match: this.listifyIfNeeded(matchs),
-            start: this.formatTimeToPrometheus(start),
-            end: this.formatTimeToPrometheus(end),
+            start: start ? this.formatTimeToPrometheus(start) : undefined,
+            end: end ? this.formatTimeToPrometheus(end) : undefined,
         };
         return (this.options.preferPost)
             ? this.request('POST', 'labels', null, params)
@@ -379,8 +379,8 @@ class PrometheusDriver {
     labelValues(labelName, matchs, start, end) {
         const params = {
             match: this.listifyIfNeeded(matchs),
-            start: this.formatTimeToPrometheus(start, new Date()),
-            end: this.formatTimeToPrometheus(end, new Date()),
+            start: start ? this.formatTimeToPrometheus(start) : undefined,
+            end: end ? this.formatTimeToPrometheus(end) : undefined,
         };
         return this.request('GET', `label/${labelName}/values`, params);
     }

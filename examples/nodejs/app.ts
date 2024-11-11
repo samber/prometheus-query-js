@@ -9,7 +9,7 @@ const query = 'up{instance="demo.do.prometheus.io:9090",job="prometheus"}';
 // const query = 'up{}';
 
 // last value
-prom.instantQuery(query, null)
+prom.instantQuery(query)
     .then((res: QueryResult) => {
         console.log("****************", "[instantQuery] Query:", query, "****************")
         console.log("\n");
@@ -53,6 +53,15 @@ prom.series(query, new Date().getTime() - 24 * 60 * 60 * 1000, new Date())
 // list all active alerts
 prom.alerts()
     .then((res: Alert[]) => {
+        console.log("****************", "[alerts]", "****************");
+        console.log(res)
+        console.log("\n");
+    })
+    .catch(console.error);
+
+// list all active alerts
+prom.labelValues("instance")
+    .then((res: string[]) => {
         console.log("****************", "[alerts]", "****************");
         console.log(res)
         console.log("\n");

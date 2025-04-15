@@ -1,10 +1,10 @@
 import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { QueryResult, Metric, RuleGroup, Alert, TargetState, SerieSelector } from './types';
-export declare type PrometheusConnectionAuth = {
+export type PrometheusConnectionAuth = {
     username: string;
     password: string;
 };
-export declare type PrometheusConnectionProxy = {
+export type PrometheusConnectionProxy = {
     host: string;
     port: number;
 };
@@ -27,7 +27,7 @@ export declare class PrometheusConnectionOptions {
     };
     warningHook?: (any: any) => any;
 }
-export declare type PrometheusQueryDate = Date | number;
+export type PrometheusQueryDate = Date | number;
 export declare class PrometheusDriver {
     private options;
     private axiosInstance;
@@ -46,6 +46,10 @@ export declare class PrometheusDriver {
      */
     constructor(options: PrometheusConnectionOptions);
     private request;
+    /**
+     * Normalises Axios successes **and** failures to a single shape.
+     * When `isError` is true we know `input` is an `AxiosError`.
+     */
     private handleResponse;
     private formatTimeToPrometheus;
     private listifyIfNeeded;

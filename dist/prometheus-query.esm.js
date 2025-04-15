@@ -250,33 +250,60 @@ class PrometheusDriver {
         });
         return req
             .then((res) => this.handleResponse(res))
-            .catch((res) => this.handleResponse(res));
+            .catch((res) => this.handleResponse(res, true));
     }
-    handleResponse(response) {
-        const err = response.isAxiosError || false;
-        if (err)
-            response = response.response;
-        if (!response)
+    /**
+     * Normalises Axios successes **and** failures to a single shape.
+     * When `isError` is true we know `input` is an `AxiosError`.
+     */
+    /* ───────── unified success/error normaliser ───────── */
+    handleResponse(input, isError = false) {
+        var _a, _b, _c, _d, _e;
+        /* decide whether we’re in an error path */
+        const isAxiosErr = (input === null || input === void 0 ? void 0 : input.isAxiosError) === true;
+        const errLike = isError || isAxiosErr; // either flag‑driven or Axios‑flag
+        const axiosErr = isAxiosErr ? input : undefined;
+        /* If we *do* have an AxiosError, pull its response; otherwise try best‑effort */
+        const response = isAxiosErr ? axiosErr.response
+            : !errLike ? input // happy‑path call
+                : input === null || input === void 0 ? void 0 : input.response; // non‑Axios error object
+        if (!response) {
+            const code = (_a = axiosErr === null || axiosErr === void 0 ? void 0 : axiosErr.code) !== null && _a !== void 0 ? _a : input === null || input === void 0 ? void 0 : input.code;
+            const message = (_c = (_b = axiosErr === null || axiosErr === void 0 ? void 0 : axiosErr.message) !== null && _b !== void 0 ? _b : input === null || input === void 0 ? void 0 : input.message) !== null && _c !== void 0 ? _c : 'unexpected network error';
             throw {
                 status: 'error',
-                errorType: 'unexpected_error',
-                error: 'unexpected http error',
+                errorType: code === 'ECONNABORTED' ? 'timeout_error'
+                    : ((_d = code === null || code === void 0 ? void 0 : code.startsWith) === null || _d === void 0 ? void 0 : _d.call(code, 'ERR_SSL')) ? 'ssl_error'
+                        : 'network_error',
+                error: message,
+                code,
+                original: input, // keep whatever was thrown for debugging/logs
             };
-        if (!!this.options.warningHook && !!response['warnings'] && response['warnings'].length > 0)
-            this.options.warningHook(response['warnings']);
+        }
+        if (this.options.warningHook &&
+            Array.isArray(response.warnings) &&
+            response.warnings.length) {
+            this.options.warningHook(response.warnings);
+        }
         const data = response.data;
-        if (!data || data.status == null)
+        if (!data || data.status == null) {
             throw {
                 status: 'error',
                 errorType: 'client_error',
                 error: 'unexpected client error',
+                data,
             };
-        if (err)
-            throw response;
-        // deserialize to QueryResult when necessary
-        // if (typeof (data) == 'object' && !!data['data'] && !!data['data']['resultType'])
-        //     return QueryResult.fromJSON(data['data']);
-        return data['data'];
+        }
+        if (errLike) {
+            throw {
+                status: 'error',
+                errorType: 'http_error',
+                httpStatus: response.status,
+                error: (_e = data.error) !== null && _e !== void 0 ? _e : response.statusText,
+                prometheus: data, // full Prometheus error payload
+            };
+        }
+        return data.data;
     }
     formatTimeToPrometheus(input, dEfault) {
         var _a;

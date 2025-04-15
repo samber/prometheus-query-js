@@ -103,39 +103,73 @@ export class PrometheusDriver {
         });
         return req
             .then((res: AxiosResponse) => this.handleResponse<T>(res))
-            .catch((res) => this.handleResponse<T>(res));
+            .catch((res) => this.handleResponse<T>(res, true));
     }
 
-    private handleResponse<T>(response: AxiosResponse<any> | AxiosError<any>): Promise<T> {
-        const err: boolean = (response as any).isAxiosError || false;
-        if (err)
-            response = (response as AxiosError).response;
+    /**
+     * Normalises Axios successes **and** failures to a single shape.
+     * When `isError` is true we know `input` is an `AxiosError`.
+     */
+    /* ───────── unified success/error normaliser ───────── */
 
-        if (!response)
+    private handleResponse<T>(
+        input: AxiosResponse<any> | AxiosError<any> | any,
+        isError = false,                    // set by the .catch() branch
+    ): Promise<T> {
+
+        /* decide whether we’re in an error path */
+        const isAxiosErr = (input as any)?.isAxiosError === true;
+        const errLike    = isError || isAxiosErr;          // either flag‑driven or Axios‑flag
+        const axiosErr   = isAxiosErr ? (input as AxiosError) : undefined;
+
+        /* If we *do* have an AxiosError, pull its response; otherwise try best‑effort */
+        const response: AxiosResponse | undefined =
+            isAxiosErr             ? axiosErr!.response
+                : !errLike               ? (input as AxiosResponse)      // happy‑path call
+                    : (input?.response as AxiosResponse | undefined);        // non‑Axios error object
+
+        if (!response) {
+            const code    = axiosErr?.code ?? (input?.code as string | undefined);
+            const message = axiosErr?.message ?? input?.message ?? 'unexpected network error';
+
             throw {
-                status: 'error',
-                errorType: 'unexpected_error',
-                error: 'unexpected http error',
+                status:    'error',
+                errorType:  code === 'ECONNABORTED'          ? 'timeout_error'
+                    :  code?.startsWith?.('ERR_SSL')    ? 'ssl_error'
+                        :                                    'network_error',
+                error:     message,
+                code,
+                original:  input,        // keep whatever was thrown for debugging/logs
             };
+        }
 
-        if (!!this.options.warningHook && !!response['warnings'] && response['warnings'].length > 0)
-            this.options.warningHook(response['warnings']);
-        
+        if (this.options.warningHook &&
+            Array.isArray((response as any).warnings) &&
+            (response as any).warnings.length) {
+            this.options.warningHook((response as any).warnings);
+        }
+
         const data = (response as any).data;
-        if (!data || data.status == null)
+        if (!data || data.status == null) {
             throw {
-                status: 'error',
+                status:    'error',
                 errorType: 'client_error',
-                error: 'unexpected client error',
+                error:     'unexpected client error',
+                data,
             };
+        }
 
-        if (err)
-            throw response;
+        if (errLike) {
+            throw {
+                status:      'error',
+                errorType:   'http_error',
+                httpStatus:  response.status,
+                error:       data.error ?? response.statusText,
+                prometheus:  data,      // full Prometheus error payload
+            };
+        }
 
-        // deserialize to QueryResult when necessary
-        // if (typeof (data) == 'object' && !!data['data'] && !!data['data']['resultType'])
-        //     return QueryResult.fromJSON(data['data']);
-        return data['data'];
+        return data.data;
     }
 
     private formatTimeToPrometheus(input: PrometheusQueryDate | null, dEfault?: PrometheusQueryDate): number {

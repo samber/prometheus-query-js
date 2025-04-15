@@ -77,6 +77,6 @@ export declare class RuleGroup {
     constructor(rules: Rule[], file: string, interval: number, name: string);
     static fromJSON(obj: any): RuleGroup;
 }
-export declare type SerieSelector = string | string[];
-export declare type TargetState = 'active' | 'dropped' | 'any';
-export declare type AlertState = 'firing' | 'pending' | 'inactive';
+export type SerieSelector = string | string[];
+export type TargetState = 'active' | 'dropped' | 'any';
+export type AlertState = 'firing' | 'pending' | 'inactive';

@@ -7,19 +7,19 @@
     "browser": "dist/prometheus-query.umd.js",
     "types": "./dist/index.d.ts",
     "dependencies": {
-        "axios": "^1.6.0"
+        "axios": "^1.8.4"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^21.1.0",
-        "@rollup/plugin-json": "^4.1.0",
-        "@rollup/plugin-node-resolve": "^13.2.1",
-        "@rollup/plugin-replace": "^4.0.0",
-        "npm-check-updates": "^16.3.7",
-        "rollup": "^3.29.5",
+        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-replace": "^6.0.2",
+        "npm-check-updates": "^17.1.18",
+        "rollup": "^4.40.0",
         "rollup-plugin-terser": "^7.0.2",
-        "rollup-plugin-typescript2": "^0.31.2",
-        "ts-node": "^10.7.0",
-        "typescript": "^4.6.3"
+        "rollup-plugin-typescript2": "^0.36.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
     },
     "scripts": {
         "build": "rollup -c",

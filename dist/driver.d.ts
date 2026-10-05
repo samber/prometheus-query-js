@@ -17,6 +17,7 @@ export declare class PrometheusConnectionOptions {
     withCredentials?: boolean;
     timeout?: number;
     preferPost?: boolean;
+    insecureSkipTLSVerify?: boolean;
     requestInterceptor?: {
         onFulfilled: (value: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>;
         onRejected?: (error: any) => any;
@@ -41,10 +42,12 @@ export declare class PrometheusDriver {
      *      - proxy: {host: '127.0.0.1', port: 9000}: hostname and port of a proxy server
      *      - withCredentials: indicates whether or not cross-site Access-Control requests
      *      - timeout: number of milliseconds before the request times out
+     *      - insecureSkipTLSVerify: skip TLS certificate verification, e.g. for self-signed certificates (Node.js only, throws in browsers)
      *      - warningHook: a hook for handling warning messages
      * @param {*} options
      */
     constructor(options: PrometheusConnectionOptions);
+    private newInsecureHttpsAgent;
     private request;
     /**
      * Normalises Axios successes **and** failures to a single shape.

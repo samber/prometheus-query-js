@@ -174,6 +174,9 @@ class RuleGroup {
     }
 }
 
+// Minimum Node.js version exposing process.getBuiltinModule(), the only synchronous way to load
+// `https` from both the CJS and ESM builds without a static import that would break the browser bundle.
+const INSECURE_SKIP_TLS_VERIFY_UNSUPPORTED_ERROR = 'insecureSkipTLSVerify is supported only in Node.js >= 20.16: browsers cannot disable TLS certificate verification';
 class PrometheusConnectionOptions {
     constructor() {
         this.baseURL = '/api/v1/';
@@ -183,6 +186,7 @@ class PrometheusConnectionOptions {
         this.withCredentials = false;
         this.timeout = 10000; // ms
         this.preferPost = false;
+        this.insecureSkipTLSVerify = false; // Node.js only: the constructor throws in browsers
         this.warningHook = null;
     }
 }
@@ -197,6 +201,7 @@ class PrometheusDriver {
      *      - proxy: {host: '127.0.0.1', port: 9000}: hostname and port of a proxy server
      *      - withCredentials: indicates whether or not cross-site Access-Control requests
      *      - timeout: number of milliseconds before the request times out
+     *      - insecureSkipTLSVerify: skip TLS certificate verification, e.g. for self-signed certificates (Node.js only, throws in browsers)
      *      - warningHook: a hook for handling warning messages
      * @param {*} options
      */
@@ -221,11 +226,19 @@ class PrometheusDriver {
         options.withCredentials = options.withCredentials || false;
         options.timeout = options.timeout || 10000;
         this.options = options;
-        this.axiosInstance = axios.create();
+        this.axiosInstance = axios.create(this.options.insecureSkipTLSVerify ? { httpsAgent: this.newInsecureHttpsAgent() } : {});
         if (!!this.options.requestInterceptor)
             this.axiosInstance.interceptors.request.use(this.options.requestInterceptor.onFulfilled, this.options.requestInterceptor.onRejected);
         if (!!this.options.responseInterceptor)
             this.axiosInstance.interceptors.response.use(this.options.responseInterceptor.onFulfilled, this.options.responseInterceptor.onRejected);
+    }
+    newInsecureHttpsAgent() {
+        var _a, _b;
+        // `https` is loaded at runtime so bundlers never see a Node-only import in the browser build.
+        const https = (_b = (_a = globalThis.process) === null || _a === void 0 ? void 0 : _a.getBuiltinModule) === null || _b === void 0 ? void 0 : _b.call(_a, 'https');
+        if (!https)
+            throw new Error(INSECURE_SKIP_TLS_VERIFY_UNSUPPORTED_ERROR);
+        return new https.Agent({ rejectUnauthorized: false });
     }
     request(method, uri, params, body) {
         var _a, _b, _c, _d, _e, _f;

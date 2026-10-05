@@ -244,6 +244,21 @@ new PrometheusDriver({
 });
 ```
 
+### Self-signed certificates
+
+```ts
+new PrometheusDriver({
+    endpoint: "https://prometheus.internal:9090",
+    insecureSkipTLSVerify: true
+});
+```
+
+⚠️ This disables TLS certificate verification for this driver, which allows man-in-the-middle attacks. Use it only on internal or development servers.
+
+Node.js only (>= 20.16): the constructor throws in browsers, which cannot disable TLS verification.
+
+Safer alternative: trust your CA without disabling checks, with `NODE_EXTRA_CA_CERTS=/path/to/ca.pem node app.js`.
+
 ### Hook HTTP requests and responses
 
 ```ts

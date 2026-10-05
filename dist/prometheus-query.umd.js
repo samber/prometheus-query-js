@@ -1,5 +1,5 @@
 /*!
- * prometheus-query v3.5.1
+ * prometheus-query v3.6.0
  * github.com/samber/prometheus-query-js
  * (c) 2026 prometheus-query-js Contributors
  * Released under the MIT License
